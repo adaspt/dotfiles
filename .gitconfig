@@ -1,0 +1,41 @@
+[user]
+	name = Adas Petrovas
+	email = adas.petrovas@gmail.com
+[init]
+	defaultBranch = main
+[core]
+	editor = nano
+[status]
+	short = true
+	branch = true
+[diff]
+	algorithm = histogram
+	colorMoved = plain
+	mnemonicPrefix = true
+	renames = true
+[pull]
+	rebase = merges
+[commit]
+	verbose = true
+[push]
+	autoSetupRemote = true
+	followTags = true
+[fetch]
+	prune = true
+	pruneTags = true
+	all = true
+[help]
+	autocorrect = prompt
+[rerere]
+	enabled = true
+	autoupdate = true
+[rebase]
+	autoSquash = true
+	autoStash = true
+	updateRefs = true
+[merge]
+	conflictstyle = zdiff3
+[log]
+	follow = true
+[alias]
+	incoming = log --pretty=oneline --abbrev-commit ..FETCH_HEAD
