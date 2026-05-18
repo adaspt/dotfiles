@@ -105,4 +105,3 @@ export NVM_DIR="$HOME/.nvm"
 
 
 # ---------- Custom ----------
-alias az-agersi='export AZURE_CONFIG_DIR="$HOME/.azure-agersi"'
