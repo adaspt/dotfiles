@@ -10,6 +10,23 @@ FILES=(
 
 sudo dnf install -y rclone age zsh
 
+# ---------- Computer name ----------
+read -p "Enter computer name (leave blank to skip): " COMPUTER_NAME
+if [ -n "$COMPUTER_NAME" ]; then
+  sudo hostnamectl set-hostname "$COMPUTER_NAME"
+fi
+
+# ---------- NVidia ----------
+read -p "Disable discrete NVIDIA card? (y/n): " DISABLE_NVIDIA
+if [[ "$DISABLE_NVIDIA" == "y" || "$DISABLE_NVIDIA" == "Y" ]]; then
+  if ! command -v envycontrol &> /dev/null; then
+    sudo dnf copr enable sunwire/envycontrol
+    sudo dnf install python3-envycontrol
+  fi
+  sudo envycontrol -s integrated
+fi
+
+# ---------- OneDrive setup ----------
 if ! rclone listremotes | grep -qx "${ONEDRIVE_REMOTE}:"; then
   rclone config create "$ONEDRIVE_REMOTE" onedrive config_driveid="24ED83B92E9CD012" config_drivetype="personal"
 fi
@@ -52,7 +69,7 @@ echo "Setting up resources"
 DOTFILES_DIR="$HOME/Projects/personal/dotfiles"
 mkdir -p "$DOTFILES_DIR"
 if [ ! -d "$DOTFILES_DIR/.git" ]; then
-  git clone git@github.com:adaspt/dotfiles.git "$DOTFILES_DIR" # || true
+  git clone git@github.com:adaspt/dotfiles.git "$DOTFILES_DIR"
 else
   git -C "$DOTFILES_DIR" pull
 fi
