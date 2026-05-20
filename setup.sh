@@ -52,6 +52,7 @@ if ! nmcli connection show agersi-vpn &> /dev/null; then
   age --decrypt "$HOME/Downloads/agersi-vpn.conf.age" > "$HOME/Downloads/agersi-vpn.conf"
   nmcli connection import type wireguard file "$HOME/Downloads/agersi-vpn.conf"
   nmcli connection modify agersi-vpn connection.autoconnect no
+  nmcli connection down agersi-vpn
   rm -f "$HOME/Downloads/agersi-vpn.conf" "$HOME/Downloads/agersi-vpn.conf.age"
 fi
 
