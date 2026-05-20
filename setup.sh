@@ -5,7 +5,7 @@ DOTFILES_DIR="$HOME/Projects/personal/dotfiles"
 
 
 # ---------- Computer name ----------
-read -p "Enter computer name ($(hostnamectl hostname), leave blank to skip): " COMPUTER_NAME
+read -p "Enter computer name (leave blank to skip): " COMPUTER_NAME
 if [ -n "$COMPUTER_NAME" ]; then
   sudo hostnamectl set-hostname "$COMPUTER_NAME"
 fi
@@ -47,7 +47,7 @@ find "$HOME/.ssh" -maxdepth 1 -type f -name "*.pub" -exec chmod 644 {} +
 
 
 # ---------- VPN ----------
-if ! nmcli connection show agersi-vpn &> /dev/null; then
+if [ -f "$HOME/Downloads/agersi-vpn.conf.age" ] && ! nmcli connection show agersi-vpn &> /dev/null; then
   echo "Setting up VPN connection"
   age --decrypt "$HOME/Downloads/agersi-vpn.conf.age" > "$HOME/Downloads/agersi-vpn.conf"
   nmcli connection import type wireguard file "$HOME/Downloads/agersi-vpn.conf"
