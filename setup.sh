@@ -137,3 +137,76 @@ if ! command -v yazi &> /dev/null; then
   sudo dnf install -y yazi
 fi
 
+# ---------- Apps ----------
+# VS Code
+if ! command -v code &> /dev/null; then
+  sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc &&
+  echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\nautorefresh=1\ntype=rpm-md\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.repos.d/vscode.repo > /dev/null
+  sudo dnf install -y code
+fi
+
+# Gradia
+if ! flatpak list --columns=application | grep -q "^be.alexandervanhee.gradia$"; then
+  flatpak install -y flathub be.alexandervanhee.gradia
+fi
+
+
+# ---------- GNOME Settings ----------
+echo "Configuring GNOME desktop preferences..."
+
+# 1. Turn off WiFi & bluetooth
+nmcli radio wifi off
+rfkill block bluetooth
+
+# 2. Lock screen
+gsettings set org.gnome.desktop.session idle-delay 480
+gsettings set org.gnome.desktop.screensaver lock-delay 120
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+
+# 3. Desktop preferences
+gsettings set org.gnome.desktop.interface enable-hot-corners false
+gsettings set org.gnome.desktop.search-providers disable-external true
+gsettings set org.gnome.desktop.peripherals.keyboard numlock-state "true"
+gsettings set org.gnome.desktop.interface cursor-size 32
+gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'lt')]"
+gsettings set org.gnome.desktop.input-sources xkb-options "['grp:alt_shift_toggle']"
+gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
+gsettings set org.gnome.shell favorite-apps "['org.gnome.Ptyxis.desktop', 'google-chrome.desktop', 'code.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>e']"
+
+# 4. Create shortcut "Screenshot with Gradia interactive" (Shift+Super+s)
+# GNOME handles custom shortcuts via a path array in dconf.
+SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
+
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$SHORTCUT_PATH']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$SHORTCUT_PATH name "Screenshot with Gradia interactive"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$SHORTCUT_PATH command "flatpak run be.alexandervanhee.gradia --screenshot=INTERACTIVE"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$SHORTCUT_PATH binding "<Shift><Super>s"
+
+# 5. Switch windows of application
+gsettings set org.gnome.desktop.wm.keybindings switch-group "['<Alt>F6']"
+gsettings set org.gnome.desktop.wm.keybindings cycle-group "['<Super>Above_Tab']"
+
+# 6. Weather
+WEATHER_LOCATION="[<(uint32 2, <('Kaunas', 'EYKA', true, [(0.95818575934488692, 0.41748275707704363)], [(0.95818575934488692, 0.41713369122664473)])>)>]"
+gsettings set org.gnome.Weather locations "$WEATHER_LOCATION"
+gsettings set org.gnome.shell.weather locations "$WEATHER_LOCATION"
+gsettings set org.gnome.shell.weather automatic-location false
+gsettings set org.gnome.GWeather4 temperature-unit 'centigrade'
+
+# 7. Dash to Dock
+sudo dnf install -y gnome-shell-extension-dash-to-dock
+EXTENSION_ID="dash-to-dock@micxgx.gmail.com"
+CURRENT_EXTENSIONS=$(gsettings get org.gnome.shell enabled-extensions)
+if [[ "$CURRENT_EXTENSIONS" != *"$EXTENSION_ID"* ]]; then
+  if [[ "$CURRENT_EXTENSIONS" == "@as []" || "$CURRENT_EXTENSIONS" == "[]" ]]; then
+    gsettings set org.gnome.shell enabled-extensions "['$EXTENSION_ID']"
+  else
+    gsettings set org.gnome.shell enabled-extensions "$(echo "$CURRENT_EXTENSIONS" | sed "s/]$/, '$EXTENSION_ID']/")"
+  fi
+fi
+gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor "true"
+gsettings set org.gnome.shell.extensions.dash-to-dock require-pressure-to-show "false"
+gsettings set org.gnome.shell.extensions.dash-to-dock shortcut-timeout "5.0"
+gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "'DYNAMIC'"
+
