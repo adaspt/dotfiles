@@ -79,6 +79,17 @@ function y() {
 }
 
 
+# ---------- Optional plugins ----------
+[[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
+  source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+
+[[ -f "$HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ]] &&
+  source "$HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+
+[[ -f "$HOME/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh" ]] &&
+  source "$HOME/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh"
+
+
 # ---------- Keybindings ----------
 cdParentKey() {
   cd ..
@@ -92,17 +103,6 @@ bindkey '^[[1;5C' forward-word
 bindkey '^[[1;5D' backward-word
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
-
-
-# ---------- Optional plugins ----------
-[[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
-  source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
-
-[[ -f "$HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ]] &&
-  source "$HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
-
-[[ -f "$HOME/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh" ]] &&
-  source "$HOME/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh"
 
 
 # ---------- CLI integrations ----------
