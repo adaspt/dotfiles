@@ -14,6 +14,7 @@ setopt HIST_VERIFY
 
 # ---------- Shell behavior ----------
 setopt autocd
+setopt nobeep
 setopt extendedglob
 setopt notify
 setopt nomatch
@@ -24,6 +25,7 @@ autoload -Uz compinit
 compinit
 
 zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
 
 # ---------- Git branch in prompt ----------
@@ -56,11 +58,13 @@ export EDITOR='nano'
 
 # ---------- Aliases ----------
 alias cls='clear'
-alias ls='command ls --color=auto --group-directories-first -F'
-alias la='ls -lAh'
+alias ls='eza --icons --group-directories-first'
+alias la='eza -lah --icons --git --group-directories-first'
+alias tree='eza --tree --icons'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 
+compdef eza=ls
 
 # ---------- Yazi cwd integration ----------
 function y() {
@@ -84,6 +88,11 @@ cdParentKey() {
 zle -N cdParentKey
 bindkey '^[[1;3A' cdParentKey
 
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
 
 # ---------- Optional plugins ----------
 [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
@@ -91,6 +100,9 @@ bindkey '^[[1;3A' cdParentKey
 
 [[ -f "$HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ]] &&
   source "$HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+
+[[ -f "$HOME/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh" ]] &&
+  source "$HOME/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh"
 
 
 # ---------- CLI integrations ----------

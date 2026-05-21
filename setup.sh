@@ -11,8 +11,31 @@ if [ -n "$COMPUTER_NAME" ]; then
 fi
 
 
+# ---------- Boot messages ----------
+GRUB_FILE="/etc/default/grub"
+if grep -qE "rhgb|quiet" "$GRUB_FILE"; then
+    echo "Removing 'rhgb' and 'quiet' from kernel boot arguments..."
+    sudo sed -i -E '/GRUB_CMDLINE_LINUX=/ s/\b(rhgb|quiet)\b\s*//g' "$GRUB_FILE"
+    sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+fi
+
+
 # ---------- NVidia ----------
-read -p "Disable discrete NVIDIA card? (y/n): " DISABLE_NVIDIA
+read -p "Install latest NVIDIA drivers? (y/N): " INSTALL_NVIDIA
+if [[ "$INSTALL_NVIDIA" == "y" || "$INSTALL_NVIDIA" == "Y" ]]; then
+  sudo dnf install -y akmod-nvidia xorg-x11-drv-nvidia-cuda libva-nvidia-driver
+  sudo akmods
+  while ! modinfo -F version nvidia &>/dev/null; do
+    echo -n "."
+    sleep 3
+  done
+  DRIVER_VER=$(modinfo -F version nvidia)
+  echo "NVIDIA driver is successfully built! Current version: $DRIVER_VER"
+  read -p "Press Enter to reboot..."
+  sudo reboot
+fi
+
+read -p "Disable discrete NVIDIA card? (y/N): " DISABLE_NVIDIA
 if [[ "$DISABLE_NVIDIA" == "y" || "$DISABLE_NVIDIA" == "Y" ]]; then
   if ! command -v envycontrol &> /dev/null; then
     sudo dnf copr enable -y sunwire/envycontrol
@@ -22,8 +45,17 @@ if [[ "$DISABLE_NVIDIA" == "y" || "$DISABLE_NVIDIA" == "Y" ]]; then
 fi
 
 
+# ---------- Login display config
+read -p "Do you want to copy existing display config to Login screen? (y/N) " COPY_DISPLAY_CONFIG
+if [[ "$COPY_DISPLAY_CONFIG" == "y" || "$COPY_DISPLAY_CONFIG" == "Y" ]]; then
+  sudo mkdir -p /var/lib/gdm/seat0/config
+  sudo cp "$HOME/.config/monitors.xml" /var/lib/gdm/seat0/config/
+  sudo chown -R gdm:gdm /var/lib/gdm/seat0/config
+fi
+
+
 # ---------- Dependencies ----------
-sudo dnf install -y age git google-chrome-stable tmux zsh
+sudo dnf install -y age eza git fzf google-chrome-stable tmux zoxide zsh
 
 
 # ---------- SSH ----------
@@ -45,6 +77,8 @@ find "$HOME/.ssh" -maxdepth 1 -type f -name "*.pub" -exec chmod 644 {} +
 [ -f "$HOME/.ssh/authorized_keys" ] && chmod 600 "$HOME/.ssh/authorized_keys"
 [ -f "$HOME/.ssh/known_hosts" ] && chmod 644 "$HOME/.ssh/known_hosts"
 
+systemctl is-enabled --quiet sshd.service || sudo systemctl enable --now sshd.service
+
 
 # ---------- VPN ----------
 if [ -f "$HOME/Downloads/agersi-vpn.conf.age" ] && ! nmcli connection show agersi-vpn &> /dev/null; then
@@ -56,6 +90,7 @@ if [ -f "$HOME/Downloads/agersi-vpn.conf.age" ] && ! nmcli connection show agers
   rm -f "$HOME/Downloads/agersi-vpn.conf" "$HOME/Downloads/agersi-vpn.conf.age"
 fi
 
+
 # ---------- Dotfiles ----------
 echo "Setting up dotfiles"
 mkdir -p "$(dirname "$DOTFILES_DIR")"
@@ -65,9 +100,10 @@ else
   git -C "$DOTFILES_DIR" pull
 fi
 
+
 # ---------- Shell configuration ----------
 echo "Setting up shell"
-chsh -s "$(which zsh)"
+[[ "$SHELL" != */zsh ]] && chsh -s "$(which zsh)"
 cp -r "$DOTFILES_DIR/config/." "$HOME/"
 mkdir -p "$HOME/.zsh"
 if [ ! -d "$HOME/.zsh/fast-syntax-highlighting/.git" ]; then
@@ -79,6 +115,11 @@ if [ ! -d "$HOME/.zsh/zsh-autosuggestions/.git" ]; then
   git clone https://github.com/zsh-users/zsh-autosuggestions.git "$HOME/.zsh/zsh-autosuggestions"
 else
   git -C "$HOME/.zsh/zsh-autosuggestions" pull
+fi
+if [ ! -d "$HOME/.zsh/zsh-history-substring-search/.git" ]; then
+  git clone https://github.com/zsh-users/zsh-history-substring-search.git "$HOME/.zsh/zsh-history-substring-search"
+else
+  git -C "$HOME/.zsh/zsh-history-substring-search" pull
 fi
 
 
