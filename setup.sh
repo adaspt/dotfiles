@@ -171,7 +171,7 @@ gsettings set org.gnome.desktop.interface cursor-size 32
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'lt')]"
 gsettings set org.gnome.desktop.input-sources xkb-options "['grp:alt_shift_toggle']"
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
-gsettings set org.gnome.shell favorite-apps "['org.gnome.Ptyxis.desktop', 'google-chrome.desktop', 'code.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop']"
+gsettings set org.gnome.shell favorite-apps "['org.gnome.Calculator.desktop', 'org.gnome.Ptyxis.desktop', 'google-chrome.desktop', 'code.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Nautilus.desktop']"
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>e']"
 
 # 4. Create shortcut "Screenshot with Gradia interactive" (Shift+Super+s)
