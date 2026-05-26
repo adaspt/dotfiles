@@ -16,6 +16,7 @@ setopt HIST_VERIFY
 setopt autocd
 setopt nobeep
 setopt extendedglob
+setopt nocaseglob
 setopt notify
 setopt nomatch
 
@@ -25,8 +26,9 @@ autoload -Uz compinit
 compinit
 
 zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' rehash true
 
 # ---------- Git branch in prompt ----------
 autoload -Uz vcs_info
@@ -48,7 +50,7 @@ else
   HOST_INFO=''
 fi
 
-PS1='${HOST_INFO}%F{blue}%B%~%b%f%F{red}${vcs_info_msg_0_}%f
+PROMPT='${HOST_INFO}%F{blue}%B%~%b%f%F{red}${vcs_info_msg_0_}%f
 %F{magenta}❯%f '
 
 
@@ -63,6 +65,9 @@ alias la='eza -lah --icons --git --group-directories-first'
 alias tree='eza --tree --icons'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
+alias cp='cp -i'
+alias mv='mv -i'
+alias rm='rm -i'
 
 compdef eza=ls
 
@@ -103,8 +108,12 @@ bindkey '^[[1;5C' forward-word
 bindkey '^[[1;5D' backward-word
 bindkey '^[[H' beginning-of-line
 bindkey '^[[F' end-of-line
+bindkey '^?' backward-delete-char
+bindkey '^[[3~' delete-char
+bindkey '^H' backward-kill-word
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
+bindkey '^[[Z' undo                             # Shift+Tab for undo
 
 
 # ---------- CLI integrations ----------
