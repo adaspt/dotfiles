@@ -45,7 +45,7 @@ if [[ "$DISABLE_NVIDIA" == "y" || "$DISABLE_NVIDIA" == "Y" ]]; then
 fi
 
 
-# ---------- Login display config
+# ---------- Login display config ----------
 read -p "Do you want to copy existing display config to Login screen? (y/N) " COPY_DISPLAY_CONFIG
 if [[ "$COPY_DISPLAY_CONFIG" == "y" || "$COPY_DISPLAY_CONFIG" == "Y" ]]; then
   sudo mkdir -p /var/lib/gdm/seat0/config
@@ -175,7 +175,6 @@ gsettings set org.gnome.shell favorite-apps "['org.gnome.Calculator.desktop', 'o
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>e']"
 
 # 4. Create shortcut "Screenshot with Gradia interactive" (Shift+Super+s)
-# GNOME handles custom shortcuts via a path array in dconf.
 SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$SHORTCUT_PATH']"
@@ -194,19 +193,46 @@ gsettings set org.gnome.shell.weather locations "$WEATHER_LOCATION"
 gsettings set org.gnome.shell.weather automatic-location false
 gsettings set org.gnome.GWeather4 temperature-unit 'centigrade'
 
-# 7. Dash to Dock
-sudo dnf install -y gnome-shell-extension-dash-to-dock
-EXTENSION_ID="dash-to-dock@micxgx.gmail.com"
-CURRENT_EXTENSIONS=$(gsettings get org.gnome.shell enabled-extensions)
-if [[ "$CURRENT_EXTENSIONS" != *"$EXTENSION_ID"* ]]; then
-  if [[ "$CURRENT_EXTENSIONS" == "@as []" || "$CURRENT_EXTENSIONS" == "[]" ]]; then
-    gsettings set org.gnome.shell enabled-extensions "['$EXTENSION_ID']"
-  else
-    gsettings set org.gnome.shell enabled-extensions "$(echo "$CURRENT_EXTENSIONS" | sed "s/]$/, '$EXTENSION_ID']/")"
-  fi
+
+# ---------- GNOME Extensions ----------
+echo "Installing GNOME extensions..."
+sudo dnf install -y pipx
+if ! pipx list --short 2>/dev/null | grep -qx "gnome-extensions-cli"; then
+  pipx install gnome-extensions-cli --system-site-packages
 fi
+
+if command -v gnome-extensions-cli &> /dev/null; then
+  GEXT_CLI="$(command -v gnome-extensions-cli)"
+elif [ -x "$HOME/.local/bin/gnome-extensions-cli" ]; then
+  GEXT_CLI="$HOME/.local/bin/gnome-extensions-cli"
+else
+  echo "gnome-extensions-cli was not found after installation."
+  exit 1
+fi
+
+# 1. Dash to Dock
+"$GEXT_CLI" install dash-to-dock@micxgx.gmail.com
+gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup "true"
 gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor "true"
 gsettings set org.gnome.shell.extensions.dash-to-dock require-pressure-to-show "false"
 gsettings set org.gnome.shell.extensions.dash-to-dock shortcut-timeout "5.0"
 gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "'DYNAMIC'"
 
+# 2. Clipboard indicator
+"$GEXT_CLI" install clipboard-indicator@tudmotu.com
+
+# 3. Focus changer
+"$GEXT_CLI" install focus-changer@heartmire
+gsettings set org.gnome.shell.extensions.focus-changer focus-down "['<Control><Super>Down']"
+gsettings set org.gnome.shell.extensions.focus-changer focus-left "['<Control><Super>Left']"
+gsettings set org.gnome.shell.extensions.focus-changer focus-right "['<Control><Super>Right']"
+gsettings set org.gnome.shell.extensions.focus-changer focus-up "['<Control><Super>Up']"
+
+# 4. Window Width
+WINDOW_WIDTH_DIR="$HOME/.local/share/gnome-shell/extensions/window-width@adaspt"
+if [ ! -d "$WINDOW_WIDTH_DIR/.git" ]; then
+  git clone git@github.com:adaspt/gnome-shell-extension-window-width.git "$WINDOW_WIDTH_DIR"
+else
+  git -C "$WINDOW_WIDTH_DIR" pull --ff-only
+fi
+gnome-extensions enable window-width@adaspt
