@@ -196,22 +196,11 @@ gsettings set org.gnome.GWeather4 temperature-unit 'centigrade'
 
 # ---------- GNOME Extensions ----------
 echo "Installing GNOME extensions..."
-sudo dnf install -y pipx
-if ! pipx list --short 2>/dev/null | grep -qx "gnome-extensions-cli"; then
-  pipx install gnome-extensions-cli --system-site-packages
-fi
-
-if command -v gnome-extensions-cli &> /dev/null; then
-  GEXT_CLI="$(command -v gnome-extensions-cli)"
-elif [ -x "$HOME/.local/bin/gnome-extensions-cli" ]; then
-  GEXT_CLI="$HOME/.local/bin/gnome-extensions-cli"
-else
-  echo "gnome-extensions-cli was not found after installation."
-  exit 1
-fi
 
 # 1. Dash to Dock
-"$GEXT_CLI" install dash-to-dock@micxgx.gmail.com
+gnome-browser-connector "gnome-extensions://dash-to-dock%40micxgx.gmail.com/?action=install"
+export GSETTINGS_SCHEMA_DIR=$HOME/.local/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/schemas/
+read -p "Press Enter to configure Dash to Dock settings..."
 gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup "true"
 gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor "true"
 gsettings set org.gnome.shell.extensions.dash-to-dock require-pressure-to-show "false"
@@ -219,10 +208,12 @@ gsettings set org.gnome.shell.extensions.dash-to-dock shortcut-timeout "5.0"
 gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "'DYNAMIC'"
 
 # 2. Clipboard indicator
-"$GEXT_CLI" install clipboard-indicator@tudmotu.com
+gnome-browser-connector "gnome-extensions://clipboard-indicator%40tudmotu.com/?action=install"
 
 # 3. Focus changer
-"$GEXT_CLI" install focus-changer@heartmire
+gnome-browser-connector "gnome-extensions://focus-changer%40heartmire/?action=install"
+export GSETTINGS_SCHEMA_DIR=$HOME/.local/share/gnome-shell/extensions/focus-changer@heartmire/schemas/
+read -p "Press Enter to configure Focus changer settings..."
 gsettings set org.gnome.shell.extensions.focus-changer focus-down "['<Control><Super>Down']"
 gsettings set org.gnome.shell.extensions.focus-changer focus-left "['<Control><Super>Left']"
 gsettings set org.gnome.shell.extensions.focus-changer focus-right "['<Control><Super>Right']"
