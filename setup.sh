@@ -227,4 +227,11 @@ if [ ! -d "$WINDOW_WIDTH_DIR/.git" ]; then
 else
   git -C "$WINDOW_WIDTH_DIR" pull --ff-only
 fi
-gnome-extensions enable window-width@adaspt
+
+# 5. Focus Ring
+FOCUS_RING_DIR="$HOME/.local/share/gnome-shell/extensions/focus-ring@adaspt"
+if [ ! -d "$FOCUS_RING_DIR/.git" ]; then
+  git clone git@github.com:adaspt/gnome-shell-extension-focus-ring.git "$FOCUS_RING_DIR"
+else
+  git -C "$FOCUS_RING_DIR" pull --ff-only
+fi
