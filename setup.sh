@@ -7,11 +7,7 @@ DOTFILES_DIR="$HOME/Projects/personal/dotfiles"
 # ---------- NVidia ----------
 read -p "Disable discrete NVIDIA card? (y/N): " DISABLE_NVIDIA
 if [[ "$DISABLE_NVIDIA" == "y" || "$DISABLE_NVIDIA" == "Y" ]]; then
-  if ! command -v envycontrol &> /dev/null; then
-    sudo dnf copr enable -y sunwire/envycontrol
-    sudo dnf install -y python3-envycontrol
-  fi
-  sudo envycontrol -s integrated
+  sudo bash "$DOTFILES_DIR/disable-nvidia/install.sh"
 fi
 
 
@@ -25,7 +21,19 @@ fi
 
 
 # ---------- Dependencies ----------
-sudo dnf install -y age eza git fzf ghostty google-chrome-stable tmux zoxide zsh
+sudo pacman -Syu --needed --noconfirm base-devel git
+sudo pacman -S --needed --noconfirm age eza fzf ghostty htop tmux zoxide zsh ttf-jetbrains-mono-nerd yazi
+
+if ! command -v yay &> /dev/null; then
+  tmpdir=$(mktemp -d)
+  git clone https://aur.archlinux.org/yay.git "$tmpdir/yay"
+  pushd "$tmpdir/yay" >/dev/null
+  makepkg -si --noconfirm
+  popd >/dev/null
+  rm -rf "$tmpdir"
+fi
+
+yay -S --noconfirm google-chrome visual-studio-code-bin gradia
 
 
 # ---------- SSH ----------
@@ -98,27 +106,6 @@ echo "Setting up fonts"
 mkdir -p "$HOME/.local/share/fonts"
 cp -r "$DOTFILES_DIR/fonts"/* "$HOME/.local/share/fonts"
 fc-cache -fv
-
-
-# ---------- Yazi ----------
-if ! command -v yazi &> /dev/null; then
-  echo "Setting up Yazi"
-  sudo dnf copr enable -y lihaohong/yazi
-  sudo dnf install -y yazi
-fi
-
-# ---------- Apps ----------
-# VS Code
-if ! command -v code &> /dev/null; then
-  sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc &&
-  echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\nautorefresh=1\ntype=rpm-md\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.repos.d/vscode.repo > /dev/null
-  sudo dnf install -y code
-fi
-
-# Gradia
-if ! flatpak list --columns=application | grep -q "^be.alexandervanhee.gradia$"; then
-  flatpak install -y flathub be.alexandervanhee.gradia
-fi
 
 
 # ---------- GNOME Settings ----------
