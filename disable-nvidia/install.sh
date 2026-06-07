@@ -1,39 +1,34 @@
 #!/usr/bin/env bash
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+set -euo pipefail
 
 # Ensure the script is run with sudo
-if [ "$EUID" -ne 0 ]; then
+if [ "${EUID:-}" -ne 0 ]; then
     echo "❌ Please run this script with sudo or as root:"
     echo "sudo ./install.sh"
     exit 1
 fi
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+TARGET_UDEV_RULE="/etc/udev/rules.d/00-remove-nvidia.rules"
+TARGET_BLACKLIST="/etc/modprobe.d/blacklist-nvidia.conf"
+SOURCE_UDEV_RULE="${SCRIPT_DIR}/00-remove-nvidia.rules"
+SOURCE_BLACKLIST="${SCRIPT_DIR}/blacklist-nvidia.conf"
 
 echo "🛠️  Starting NVIDIA isolation setup..."
 
-# 1. Deploy the udev rule with high priority (00-)
-echo "📦 Copying udev rule..."
-cp "${SCRIPT_DIR}/50-remove-nvidia.rules" /etc/udev/rules.d/00-remove-nvidia.rules
-chmod 644 /etc/udev/rules.d/00-remove-nvidia.rules
-chown root:root /etc/udev/rules.d/00-remove-nvidia.rules
+echo "📦 Deploying udev rule..."
+install -Dm644 "${SOURCE_UDEV_RULE}" "${TARGET_UDEV_RULE}"
 
-# 2. Deploy the modprobe blacklist config
-echo "📦 Copying modprobe blacklist..."
-cp "${SCRIPT_DIR}/blacklist-nvidia.conf" /etc/modprobe.d/blacklist-nvidia.conf
-chmod 644 /etc/modprobe.d/blacklist-nvidia.conf
-chown root:root /etc/modprobe.d/blacklist-nvidia.conf
+echo "📦 Deploying modprobe blacklist..."
+install -Dm644 "${SOURCE_BLACKLIST}" "${TARGET_BLACKLIST}"
 
-# 3. Reload udev rules to apply changes to the current session
 echo "🔄 Reloading udev rules..."
 udevadm control --reload-rules
 udevadm trigger
 
-# 4. Regenerate initcpio images for the early boot stage
-echo "⚙️  Regenerating initcpio presets..."
+echo "⚙️  Regenerating initramfs images..."
 mkinitcpio -P
 
-echo "✅ Done! The malfunctioning NVIDIA GPU is permanently blocked."
-echo "🔄 Please reboot your ThinkPad to fully apply changes."
+echo "✅ NVIDIA isolation setup completed."
+echo "🔄 Please reboot your system to fully apply changes."
