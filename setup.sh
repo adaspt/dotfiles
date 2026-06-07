@@ -4,37 +4,7 @@ set -euo pipefail
 DOTFILES_DIR="$HOME/Projects/personal/dotfiles"
 
 
-# ---------- Computer name ----------
-read -p "Enter computer name (leave blank to skip): " COMPUTER_NAME
-if [ -n "$COMPUTER_NAME" ]; then
-  sudo hostnamectl set-hostname "$COMPUTER_NAME"
-fi
-
-
-# ---------- Boot messages ----------
-GRUB_FILE="/etc/default/grub"
-if grep -qE "rhgb|quiet" "$GRUB_FILE"; then
-    echo "Removing 'rhgb' and 'quiet' from kernel boot arguments..."
-    sudo sed -i -E '/GRUB_CMDLINE_LINUX=/ s/\b(rhgb|quiet)\b\s*//g' "$GRUB_FILE"
-    sudo grub2-mkconfig -o /boot/grub2/grub.cfg
-fi
-
-
 # ---------- NVidia ----------
-read -p "Install latest NVIDIA drivers? (y/N): " INSTALL_NVIDIA
-if [[ "$INSTALL_NVIDIA" == "y" || "$INSTALL_NVIDIA" == "Y" ]]; then
-  sudo dnf install -y akmod-nvidia xorg-x11-drv-nvidia-cuda libva-nvidia-driver
-  sudo akmods
-  while ! modinfo -F version nvidia &>/dev/null; do
-    echo -n "."
-    sleep 3
-  done
-  DRIVER_VER=$(modinfo -F version nvidia)
-  echo "NVIDIA driver is successfully built! Current version: $DRIVER_VER"
-  read -p "Press Enter to reboot..."
-  sudo reboot
-fi
-
 read -p "Disable discrete NVIDIA card? (y/N): " DISABLE_NVIDIA
 if [[ "$DISABLE_NVIDIA" == "y" || "$DISABLE_NVIDIA" == "Y" ]]; then
   if ! command -v envycontrol &> /dev/null; then
@@ -46,7 +16,7 @@ fi
 
 
 # ---------- Login display config ----------
-read -p "Do you want to copy existing display config to Login screen? (y/N) " COPY_DISPLAY_CONFIG
+read -p "Do you want to copy existing display config to GDM Login screen? (y/N) " COPY_DISPLAY_CONFIG
 if [[ "$COPY_DISPLAY_CONFIG" == "y" || "$COPY_DISPLAY_CONFIG" == "Y" ]]; then
   sudo mkdir -p /var/lib/gdm/seat0/config
   sudo cp "$HOME/.config/monitors.xml" /var/lib/gdm/seat0/config/
@@ -55,7 +25,6 @@ fi
 
 
 # ---------- Dependencies ----------
-sudo dnf copr enable -y scottames/ghostty
 sudo dnf install -y age eza git fzf ghostty google-chrome-stable tmux zoxide zsh
 
 
