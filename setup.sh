@@ -22,7 +22,7 @@ fi
 
 # ---------- Dependencies ----------
 sudo pacman -Syu --needed --noconfirm base-devel git
-sudo pacman -S --needed --noconfirm age eza fzf ghostty htop tmux zoxide zsh ttf-jetbrains-mono-nerd yazi
+sudo pacman -S --needed --noconfirm age eza fzf ghostty htop openssh networkmanager tmux zoxide zsh ttf-jetbrains-mono-nerd yazi
 
 if ! command -v yay &> /dev/null; then
   tmpdir=$(mktemp -d)
