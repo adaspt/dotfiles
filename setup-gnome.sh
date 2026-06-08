@@ -18,9 +18,10 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'no
 
 # 3. Desktop preferences
 gsettings set org.gnome.desktop.interface enable-hot-corners false
+gsettings set org.gnome.desktop.interface cursor-size 32
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 gsettings set org.gnome.desktop.search-providers disable-external true
 gsettings set org.gnome.desktop.peripherals.keyboard numlock-state "true"
-gsettings set org.gnome.desktop.interface cursor-size 32
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'lt')]"
 gsettings set org.gnome.desktop.input-sources xkb-options "['grp:alt_shift_toggle']"
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
@@ -50,6 +51,8 @@ gsettings set org.gnome.GWeather4 temperature-unit 'centigrade'
 # ---------- GNOME Extensions ----------
 echo "Installing GNOME extensions..."
 
+pacman -S --noconfirm gnome-browser-connector
+
 # 1. Dash to Dock
 gnome-browser-connector "gnome-extensions://dash-to-dock%40micxgx.gmail.com/?action=install"
 export GSETTINGS_SCHEMA_DIR=$HOME/.local/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/schemas/
@@ -57,22 +60,14 @@ read -p "Press Enter to configure Dash to Dock settings..."
 gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup "true"
 gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor "true"
 gsettings set org.gnome.shell.extensions.dash-to-dock require-pressure-to-show "false"
+gsettings set org.gnome.shell.extensions.dash-to-dock scroll-action='cycle-windows'
 gsettings set org.gnome.shell.extensions.dash-to-dock shortcut-timeout "5.0"
 gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "'DYNAMIC'"
 
 # 2. Clipboard indicator
 gnome-browser-connector "gnome-extensions://clipboard-indicator%40tudmotu.com/?action=install"
 
-# 3. Focus changer
-gnome-browser-connector "gnome-extensions://focus-changer%40heartmire/?action=install"
-export GSETTINGS_SCHEMA_DIR=$HOME/.local/share/gnome-shell/extensions/focus-changer@heartmire/schemas/
-read -p "Press Enter to configure Focus changer settings..."
-gsettings set org.gnome.shell.extensions.focus-changer focus-down "['<Control><Super>Down']"
-gsettings set org.gnome.shell.extensions.focus-changer focus-left "['<Control><Super>Left']"
-gsettings set org.gnome.shell.extensions.focus-changer focus-right "['<Control><Super>Right']"
-gsettings set org.gnome.shell.extensions.focus-changer focus-up "['<Control><Super>Up']"
-
-# 4. Window Width
+# 3. Window Width
 WINDOW_WIDTH_DIR="$HOME/.local/share/gnome-shell/extensions/window-width@adaspt"
 if [ ! -d "$WINDOW_WIDTH_DIR/.git" ]; then
   git clone git@github.com:adaspt/gnome-shell-extension-window-width.git "$WINDOW_WIDTH_DIR"
@@ -80,7 +75,7 @@ else
   git -C "$WINDOW_WIDTH_DIR" pull --ff-only
 fi
 
-# 5. Focus Ring
+# 4. Focus Ring
 FOCUS_RING_DIR="$HOME/.local/share/gnome-shell/extensions/focus-ring@adaspt"
 if [ ! -d "$FOCUS_RING_DIR/.git" ]; then
   git clone git@github.com:adaspt/gnome-shell-extension-focus-ring.git "$FOCUS_RING_DIR"
