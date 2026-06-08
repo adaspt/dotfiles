@@ -33,7 +33,7 @@ SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$SHORTCUT_PATH']"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$SHORTCUT_PATH name "Screenshot with Gradia interactive"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$SHORTCUT_PATH command "flatpak run be.alexandervanhee.gradia --screenshot=INTERACTIVE"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$SHORTCUT_PATH command "gradia --screenshot=INTERACTIVE"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$SHORTCUT_PATH binding "<Shift><Super>s"
 
 # 5. Switch windows of application
@@ -51,7 +51,7 @@ gsettings set org.gnome.GWeather4 temperature-unit 'centigrade'
 # ---------- GNOME Extensions ----------
 echo "Installing GNOME extensions..."
 
-pacman -S --noconfirm gnome-browser-connector
+sudo pacman -S --noconfirm gnome-browser-connector
 
 # 1. Dash to Dock
 gnome-browser-connector "gnome-extensions://dash-to-dock%40micxgx.gmail.com/?action=install"
@@ -60,7 +60,7 @@ read -p "Press Enter to configure Dash to Dock settings..."
 gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup "true"
 gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor "true"
 gsettings set org.gnome.shell.extensions.dash-to-dock require-pressure-to-show "false"
-gsettings set org.gnome.shell.extensions.dash-to-dock scroll-action='cycle-windows'
+gsettings set org.gnome.shell.extensions.dash-to-dock scroll-action "'cycle-windows'"
 gsettings set org.gnome.shell.extensions.dash-to-dock shortcut-timeout "5.0"
 gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "'DYNAMIC'"
 
