@@ -10,6 +10,12 @@ if [[ "$DISABLE_NVIDIA" == "y" || "$DISABLE_NVIDIA" == "Y" ]]; then
   sudo bash "$DOTFILES_DIR/disable-nvidia/install.sh"
 fi
 
+# ---------- Wakeup events ----------
+read -p "Disable wakeup events? (y/N): " DISABLE_WAKEUP
+if [[ "$DISABLE_WAKEUP" == "y" || "$DISABLE_WAKEUP" == "Y" ]]; then
+  sudo bash "$DOTFILES_DIR/disable-wakeup/install.sh"
+fi
+
 
 # ---------- Login display config ----------
 read -p "Do you want to copy existing display config to GDM Login screen? (y/N) " COPY_DISPLAY_CONFIG
