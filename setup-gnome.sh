@@ -19,7 +19,6 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'no
 # 3. Desktop preferences
 gsettings set org.gnome.desktop.interface enable-hot-corners false
 gsettings set org.gnome.desktop.interface cursor-size 32
-gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 gsettings set org.gnome.desktop.search-providers disable-external true
 gsettings set org.gnome.desktop.peripherals.keyboard numlock-state "true"
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'lt')]"
@@ -29,12 +28,12 @@ gsettings set org.gnome.shell favorite-apps "['org.gnome.Calculator.desktop', 'c
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>e']"
 
 # 4. Create shortcut "Screenshot with Gradia interactive" (Shift+Super+s)
-SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
+GRADIA_SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
 
-gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$SHORTCUT_PATH']"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$SHORTCUT_PATH name "Screenshot with Gradia interactive"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$SHORTCUT_PATH command "gradia --screenshot=INTERACTIVE"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$SHORTCUT_PATH binding "<Shift><Super>s"
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$GRADIA_SHORTCUT_PATH']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GRADIA_SHORTCUT_PATH name "Screenshot with Gradia interactive"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GRADIA_SHORTCUT_PATH command "gradia --screenshot=INTERACTIVE"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GRADIA_SHORTCUT_PATH binding "<Shift><Super>s"
 
 # 5. Switch windows of application
 gsettings set org.gnome.desktop.wm.keybindings switch-group "['<Alt>F6']"
@@ -52,6 +51,9 @@ gsettings set org.gnome.GWeather4 temperature-unit 'centigrade'
 echo "Installing GNOME extensions..."
 
 sudo pacman -S --noconfirm gnome-browser-connector
+yay -S --noconfirm vicinae-bin
+systemctl --user enable vicinae --now
+
 
 # 1. Dash to Dock
 gnome-browser-connector "gnome-extensions://dash-to-dock%40micxgx.gmail.com/?action=install"
@@ -67,7 +69,15 @@ gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "'DYNAMI
 # 2. Clipboard indicator
 gnome-browser-connector "gnome-extensions://clipboard-indicator%40tudmotu.com/?action=install"
 
-# 3. Window Width
+# 3. Vicinae
+gnome-browser-connector "gnome-extensions://vicinae%40dagimg-dot/?action=install"
+VICINAE_SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/"
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$GRADIA_SHORTCUT_PATH', '$VICINAE_SHORTCUT_PATH']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$VICINAE_SHORTCUT_PATH name "Vicinae"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$VICINAE_SHORTCUT_PATH command "vicinae toggle"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$VICINAE_SHORTCUT_PATH binding "<Super>d"
+
+# 4. Window Width
 WINDOW_WIDTH_DIR="$HOME/.local/share/gnome-shell/extensions/window-width@adaspt"
 if [ ! -d "$WINDOW_WIDTH_DIR/.git" ]; then
   git clone git@github.com:adaspt/gnome-shell-extension-window-width.git "$WINDOW_WIDTH_DIR"
@@ -75,7 +85,7 @@ else
   git -C "$WINDOW_WIDTH_DIR" pull --ff-only
 fi
 
-# 4. Focus Ring
+# 5. Focus Ring
 FOCUS_RING_DIR="$HOME/.local/share/gnome-shell/extensions/focus-ring@adaspt"
 if [ ! -d "$FOCUS_RING_DIR/.git" ]; then
   git clone git@github.com:adaspt/gnome-shell-extension-focus-ring.git "$FOCUS_RING_DIR"
