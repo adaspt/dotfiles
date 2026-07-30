@@ -1,3 +1,6 @@
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
 # ---------- History ----------
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000
@@ -31,27 +34,27 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' rehash true
 
 # ---------- Git branch in prompt ----------
-autoload -Uz vcs_info
-zstyle ':vcs_info:*' enable git
-zstyle ':vcs_info:git:*' formats ' (%b)'
+# autoload -Uz vcs_info
+# zstyle ':vcs_info:*' enable git
+# zstyle ':vcs_info:git:*' formats ' (%b)'
 
 
 # ---------- Prompt ----------
-precmd() {
-  vcs_info
-  echo
-}
+# precmd() {
+#   vcs_info
+#   echo
+# }
 
-setopt PROMPT_SUBST
+# setopt PROMPT_SUBST
 
-if [[ -n "$SSH_CONNECTION" ]]; then
-  HOST_INFO='%F{yellow}%m%f '
-else
-  HOST_INFO=''
-fi
+# if [[ -n "$SSH_CONNECTION" ]]; then
+#   HOST_INFO='%F{yellow}%m%f '
+# else
+#   HOST_INFO=''
+# fi
 
-PROMPT='${HOST_INFO}%F{blue}%B%~%b%f%F{red}${vcs_info_msg_0_}%f
-%F{magenta}❯%f '
+# PROMPT='${HOST_INFO}%F{blue}%B%~%b%f%F{red}${vcs_info_msg_0_}%f
+# %F{magenta}❯%f '
 
 
 # ---------- Editor ----------
@@ -60,9 +63,9 @@ export EDITOR='nano'
 
 # ---------- Aliases ----------
 alias cls='clear'
-alias ls='eza --icons --group-directories-first'
-alias la='eza -lah --icons --git --group-directories-first'
-alias tree='eza --tree --icons'
+alias ls='eza -a --color=always --group-directories-first --icons=always'
+alias la='eza -al --color=always --group-directories-first --icons=always'
+alias lt='eza -aT --color=always --group-directories-first --icons=always'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 alias cp='cp -i'
@@ -83,16 +86,19 @@ function y() {
   rm -f -- "$tmp"
 }
 
+# ---------- Theme ----------
+[[ -f "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme" ]] &&
+  source "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
 
 # ---------- Optional plugins ----------
-[[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
-  source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+[[ -f "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
+  source "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
-[[ -f "$HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ]] &&
-  source "$HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+[[ -f "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
+  source "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
-[[ -f "$HOME/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh" ]] &&
-  source "$HOME/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh"
+[[ -f "/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh" ]] &&
+  source "/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
 
 
 # ---------- Keybindings ----------
@@ -119,6 +125,7 @@ bindkey '^[[Z' undo                             # Shift+Tab for undo
 # ---------- CLI integrations ----------
 command -v fzf >/dev/null && source <(fzf --zsh)
 command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 
 # ---------- Custom ----------

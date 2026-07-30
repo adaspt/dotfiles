@@ -24,8 +24,8 @@ gsettings set org.gnome.desktop.peripherals.keyboard numlock-state "true"
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'lt')]"
 gsettings set org.gnome.desktop.input-sources xkb-options "['grp:alt_shift_toggle']"
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
-gsettings set org.gnome.shell favorite-apps "['org.gnome.Calculator.desktop', 'com.mitchellh.ghostty.desktop', 'google-chrome.desktop', 'code.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Nautilus.desktop']"
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>e']"
+gsettings set org.gnome.shell favorite-apps "['chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop', 'com.mitchellh.ghostty.desktop', 'google-chrome.desktop', 'code.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop']"
 
 # 4. Create shortcut "Screenshot with Gradia interactive" (Shift+Super+s)
 GRADIA_SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
@@ -51,33 +51,24 @@ gsettings set org.gnome.GWeather4 temperature-unit 'centigrade'
 echo "Installing GNOME extensions..."
 
 sudo pacman -S --noconfirm gnome-browser-connector
-yay -S --noconfirm vicinae-bin
-systemctl --user enable vicinae --now
+yay -S --noconfirm google-chrome visual-studio-code-bin gradia
 
 
 # 1. Dash to Dock
-gnome-browser-connector "gnome-extensions://dash-to-dock%40micxgx.gmail.com/?action=install"
-export GSETTINGS_SCHEMA_DIR=$HOME/.local/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/schemas/
-read -p "Press Enter to configure Dash to Dock settings..."
-gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup "true"
-gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor "true"
-gsettings set org.gnome.shell.extensions.dash-to-dock require-pressure-to-show "false"
-gsettings set org.gnome.shell.extensions.dash-to-dock scroll-action "'cycle-windows'"
-gsettings set org.gnome.shell.extensions.dash-to-dock shortcut-timeout "5.0"
-gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "'DYNAMIC'"
+# gnome-browser-connector "gnome-extensions://dash-to-dock%40micxgx.gmail.com/?action=install"
+# export GSETTINGS_SCHEMA_DIR=$HOME/.local/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/schemas/
+# read -p "Press Enter to configure Dash to Dock settings..."
+# gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup "true"
+# gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor "true"
+# gsettings set org.gnome.shell.extensions.dash-to-dock require-pressure-to-show "false"
+# gsettings set org.gnome.shell.extensions.dash-to-dock scroll-action "'cycle-windows'"
+# gsettings set org.gnome.shell.extensions.dash-to-dock shortcut-timeout "5.0"
+# gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "'DYNAMIC'"
 
 # 2. Clipboard indicator
-gnome-browser-connector "gnome-extensions://clipboard-indicator%40tudmotu.com/?action=install"
+# gnome-browser-connector "gnome-extensions://clipboard-indicator%40tudmotu.com/?action=install"
 
-# 3. Vicinae
-gnome-browser-connector "gnome-extensions://vicinae%40dagimg-dot/?action=install"
-VICINAE_SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/"
-gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$GRADIA_SHORTCUT_PATH', '$VICINAE_SHORTCUT_PATH']"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$VICINAE_SHORTCUT_PATH name "Vicinae"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$VICINAE_SHORTCUT_PATH command "vicinae toggle"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$VICINAE_SHORTCUT_PATH binding "<Super>d"
-
-# 4. Window Width
+# 3. Window Width
 WINDOW_WIDTH_DIR="$HOME/.local/share/gnome-shell/extensions/window-width@adaspt"
 if [ ! -d "$WINDOW_WIDTH_DIR/.git" ]; then
   git clone git@github.com:adaspt/gnome-shell-extension-window-width.git "$WINDOW_WIDTH_DIR"
@@ -85,7 +76,7 @@ else
   git -C "$WINDOW_WIDTH_DIR" pull --ff-only
 fi
 
-# 5. Focus Ring
+# 4. Focus Ring
 FOCUS_RING_DIR="$HOME/.local/share/gnome-shell/extensions/focus-ring@adaspt"
 if [ ! -d "$FOCUS_RING_DIR/.git" ]; then
   git clone git@github.com:adaspt/gnome-shell-extension-focus-ring.git "$FOCUS_RING_DIR"
