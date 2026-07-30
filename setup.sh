@@ -20,13 +20,8 @@ if [ ! -d "$DOTFILES_DIR/.git" ]; then
   git -C "$DOTFILES_DIR" remote set-url origin git@github.com:adaspt/dotfiles.git
 fi
 
-sudo pacman -S --needed --noconfirm pacman-contrib age eza fzf ghostty htop openssh networkmanager tmux zoxide zsh ttf-jetbrains-mono-nerd yazi 7zip
+sudo pacman -S --needed --noconfirm pacman-contrib age eza fzf ghostty htop btop less rsync openssh networkmanager tmux zoxide zsh ttf-jetbrains-mono-nerd yazi 7zip qbittorrent
 yay -S --noconfirm google-chrome visual-studio-code-bin
-
-# ---------- Configs ----------
-cp "$DOTFILES_DIR/config/.gitconfig" "$HOME/"
-cp "$DOTFILES_DIR/config/.tmux.conf" "$HOME/"
-
 
 # ---------- Fonts ----------
 echo "Setting up fonts"
@@ -37,3 +32,19 @@ fc-cache -fv
 # --------- Maintenance ----------
 sudo systemctl enable --now fstrim.timer
 sudo systemctl enable --now paccache.timer
+
+# ---------- ZSH ----------
+cp "$DOTFILES_DIR/config/.gitconfig" "$HOME/"
+cp "$DOTFILES_DIR/config/.zshrc" "$HOME/"
+cp "$DOTFILES_DIR/config/.p10k.zsh" "$HOME/"
+
+sudo pacman -S --needed --noconfirm zsh-syntax-highlighting zsh-autosuggestions zsh-history-substring-search
+yay -S --noconfirm zsh-theme-powerlevel10k
+
+[[ "$SHELL" != */zsh ]] && chsh -s "$(which zsh)"
+
+# ---------- Tmux ----------
+cp "$DOTFILES_DIR/config/.tmux.conf" "$HOME/"
+sudo loginctl enable-linger $USER
+
+echo "Main setup complete! Please RESTART your PC."
