@@ -41,7 +41,9 @@ cp "$DOTFILES_DIR/config/.p10k.zsh" "$HOME/"
 sudo pacman -S --needed --noconfirm zsh-syntax-highlighting zsh-autosuggestions zsh-history-substring-search
 yay -S --noconfirm zsh-theme-powerlevel10k
 
-[[ "$SHELL" != */zsh ]] && chsh -s "$(which zsh)"
+if [[ "$(getent passwd "$USER" | cut -d: -f7)" != */zsh ]]; then
+  sudo chsh -s "$(command -v zsh)" "$USER"
+fi
 
 # ---------- Tmux ----------
 cp "$DOTFILES_DIR/config/.tmux.conf" "$HOME/"
