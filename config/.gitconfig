@@ -38,4 +38,5 @@
 [log]
 	follow = true
 [alias]
-	incoming = log --pretty=oneline --abbrev-commit ..FETCH_HEAD
+	incoming = log --oneline --abbrev-commit ..FETCH_HEAD
+	outgoing = log @{u}..HEAD --oneline
