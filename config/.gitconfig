@@ -38,5 +38,5 @@
 [log]
 	follow = true
 [alias]
-	incoming = log --oneline --abbrev-commit ..FETCH_HEAD
+	incoming = "!f() { git log --oneline --abbrev-commit \"HEAD..${1:-FETCH_HEAD}\"; }; f"
 	outgoing = log @{u}..HEAD --oneline
