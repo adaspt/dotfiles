@@ -13,6 +13,7 @@ setopt HIST_IGNORE_DUPS
 setopt HIST_REDUCE_BLANKS
 setopt HIST_IGNORE_SPACE
 setopt HIST_VERIFY
+HISTORY_IGNORE='(cls|clear|cd ..|cd ~|exit|y)'
 
 
 # ---------- Shell behavior ----------
@@ -71,6 +72,7 @@ alias diff='diff --color=auto'
 alias cp='cp -i'
 alias mv='mv -i'
 alias rm='rm -i'
+alias ta='tmux new -A -s'
 
 compdef eza=ls
 
@@ -126,6 +128,10 @@ bindkey '^[[Z' undo                             # Shift+Tab for undo
 command -v fzf >/dev/null && source <(fzf --zsh)
 command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
+[[ ! -f /usr/share/nvm/init-nvm.sh ]] || source /usr/share/nvm/init-nvm.sh
 
 # ---------- Custom ----------
+path+=('/home/adas/.dotnet/tools')
+export PATH
+
+export DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=1000

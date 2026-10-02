@@ -20,7 +20,7 @@ if [ ! -d "$DOTFILES_DIR/.git" ]; then
   git -C "$DOTFILES_DIR" remote set-url origin git@github.com:adaspt/dotfiles.git
 fi
 
-sudo pacman -S --needed --noconfirm pacman-contrib age eza fzf ghostty htop btop less rsync openssh networkmanager tmux zoxide zsh ttf-jetbrains-mono-nerd yazi 7zip qbittorrent
+sudo pacman -S --needed --noconfirm pacman-contrib age eza fzf bat jq ghostty htop btop less rsync openssh networkmanager tmux zoxide zsh ttf-jetbrains-mono-nerd yazi 7zip qbittorrent
 yay -S --noconfirm google-chrome visual-studio-code-bin
 
 # ---------- Fonts ----------
