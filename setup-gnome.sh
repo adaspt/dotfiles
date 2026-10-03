@@ -49,8 +49,8 @@ gsettings set org.gnome.GWeather4 temperature-unit 'centigrade'
 # ---------- GNOME Extensions ----------
 echo "Installing GNOME extensions..."
 
-sudo pacman -S --noconfirm gnome-browser-connector
-yay -S --noconfirm google-chrome visual-studio-code-bin gradia
+sudo pacman -S --needed --noconfirm gnome-browser-connector
+yay -S --needed --noconfirm gradia
 
 
 # 1. Dash to Dock

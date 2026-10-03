@@ -21,7 +21,7 @@ if [ ! -d "$DOTFILES_DIR/.git" ]; then
 fi
 
 sudo pacman -S --needed --noconfirm pacman-contrib age eza curl fzf bat jq ghostty htop btop less rsync tmux zoxide zsh 7zip qbittorrent openssh networkmanager ttf-jetbrains-mono-nerd yazi
-yay -S --noconfirm google-chrome visual-studio-code-bin
+yay -S --needed --noconfirm google-chrome visual-studio-code-bin
 
 # ---------- Fonts ----------
 echo "Setting up fonts"
@@ -39,7 +39,7 @@ cp "$DOTFILES_DIR/config/.zshrc" "$HOME/"
 cp "$DOTFILES_DIR/config/.p10k.zsh" "$HOME/"
 
 sudo pacman -S --needed --noconfirm zsh-syntax-highlighting zsh-autosuggestions zsh-history-substring-search
-yay -S --noconfirm zsh-theme-powerlevel10k
+yay -S --needed --noconfirm zsh-theme-powerlevel10k
 
 if [[ "$(getent passwd "$USER" | cut -d: -f7)" != */zsh ]]; then
   sudo chsh -s "$(command -v zsh)" "$USER"

@@ -10,9 +10,8 @@ read -p "Open Chrome, download SSH keys and VPN profile, and press Enter to cont
 
 if [ -f "$HOME/Downloads/ssh.tar.gz.age" ]; then
   echo "Setting up SSH keys"
-  age --decrypt "$HOME/Downloads/ssh.tar.gz.age" > "$HOME/Downloads/ssh.tar.gz"
-  tar -xzf "$HOME/Downloads/ssh.tar.gz" -C "$HOME/.ssh"
-  rm -f "$HOME/Downloads/ssh.tar.gz" "$HOME/Downloads/ssh.tar.gz.age"
+  age --decrypt "$HOME/Downloads/ssh.tar.gz.age" | tar -xz -C "$HOME/.ssh"
+  rm -f "$HOME/Downloads/ssh.tar.gz.age"
 fi
 
 find "$HOME/.ssh" -maxdepth 1 -type f -name "id_*" ! -name "*.pub" -exec chmod 600 {} +
@@ -30,6 +29,6 @@ if [ -f "$HOME/Downloads/agersi-vpn.conf.age" ] && ! nmcli connection show agers
   age --decrypt "$HOME/Downloads/agersi-vpn.conf.age" > "$HOME/Downloads/agersi-vpn.conf"
   nmcli connection import type wireguard file "$HOME/Downloads/agersi-vpn.conf"
   nmcli connection modify agersi-vpn connection.autoconnect no
-  nmcli connection down agersi-vpn
+  nmcli connection down agersi-vpn || true
   rm -f "$HOME/Downloads/agersi-vpn.conf" "$HOME/Downloads/agersi-vpn.conf.age"
 fi
