@@ -30,7 +30,8 @@ if [ ! -f /etc/apt/sources.list.d/yazi.list ]; then
   sudo apt-get update
 fi
 
-sudo apt-get install -y age eza fzf bat ghostty htop btop tmux zoxide zsh 7zip qbittorrent openssh-server zsh-syntax-highlighting zsh-autosuggestions yazi fd-find ripgrep wl-clipboard
+sudo apt-get install -y age eza fzf bat ghostty htop btop tmux zoxide zsh 7zip qbittorrent openssh-server zsh-syntax-highlighting zsh-autosuggestions yazi fd-find ripgrep wl-clipboard flatpak
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
 # Chrome and VS Code .debs add their own apt repos for updates
 install_deb google-chrome-stable https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb

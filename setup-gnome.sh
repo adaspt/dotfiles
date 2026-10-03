@@ -24,33 +24,31 @@ gsettings set org.gnome.desktop.peripherals.keyboard numlock-state "true"
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'lt')]"
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>e']"
-gsettings set org.gnome.shell favorite-apps "['chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop', 'com.mitchellh.ghostty.desktop', 'google-chrome.desktop', 'code.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop']"
+gsettings set org.gnome.shell favorite-apps "['chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop', 'com.mitchellh.ghostty.desktop', 'google-chrome.desktop', 'com.microsoft.VSCode.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop']"
 
 # 4. Create shortcut "Screenshot with Gradia interactive" (Shift+Super+s)
 GRADIA_SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$GRADIA_SHORTCUT_PATH']"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GRADIA_SHORTCUT_PATH name "Screenshot with Gradia interactive"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GRADIA_SHORTCUT_PATH command "gradia --screenshot=INTERACTIVE"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GRADIA_SHORTCUT_PATH command "flatpak run be.alexandervanhee.gradia --screenshot=INTERACTIVE"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GRADIA_SHORTCUT_PATH binding "<Shift><Super>s"
 
 # 5. Switch windows of application
 gsettings set org.gnome.desktop.wm.keybindings switch-group "['<Alt>F6']"
 gsettings set org.gnome.desktop.wm.keybindings cycle-group "['<Super>Above_Tab']"
 
-# 6. Weather
-WEATHER_LOCATION="[<(uint32 2, <('Kaunas', 'EYKA', true, [(0.95818575934488692, 0.41748275707704363)], [(0.95818575934488692, 0.41713369122664473)])>)>]"
-gsettings set org.gnome.Weather locations "$WEATHER_LOCATION"
-gsettings set org.gnome.shell.weather locations "$WEATHER_LOCATION"
-gsettings set org.gnome.shell.weather automatic-location false
-gsettings set org.gnome.GWeather4 temperature-unit 'centigrade'
+# 6. Ubuntu Dock - bottom, auto-hide, not full width
+gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
+gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
+gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
 
 
 # ---------- GNOME Extensions ----------
 echo "Installing GNOME extensions..."
 
-sudo pacman -S --needed --noconfirm gnome-browser-connector
-yay -S --needed --noconfirm gradia
+sudo apt-get install -y gnome-browser-connector
+flatpak install -y --noninteractive --system flathub be.alexandervanhee.gradia
 
 # 1. From extensions.gnome.org (Happy Appy Hotkey, Caffeine) - confirm each install dialog
 for uuid in happy-appy-hotkey@jqno.nl caffeine@patapon.info; do
