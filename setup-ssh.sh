@@ -20,8 +20,6 @@ find "$HOME/.ssh" -maxdepth 1 -type f -name "*.pub" -exec chmod 644 {} +
 [ -f "$HOME/.ssh/authorized_keys" ] && chmod 600 "$HOME/.ssh/authorized_keys"
 [ -f "$HOME/.ssh/known_hosts" ] && chmod 644 "$HOME/.ssh/known_hosts"
 
-systemctl is-enabled --quiet sshd.service || sudo systemctl enable --now sshd.service
-
 
 # ---------- VPN ----------
 if [ -f "$DOWNLOADS_DIR/agersi-vpn.conf.age" ] && ! nmcli connection show agersi-vpn &> /dev/null; then
