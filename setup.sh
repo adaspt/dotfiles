@@ -20,14 +20,14 @@ if [ ! -d "$DOTFILES_DIR/.git" ]; then
   git -C "$DOTFILES_DIR" remote set-url origin git@github.com:adaspt/dotfiles.git
 fi
 
-sudo pacman -S --needed --noconfirm pacman-contrib age eza curl fzf bat jq ghostty htop btop less rsync tmux zoxide zsh 7zip qbittorrent openssh networkmanager ttf-jetbrains-mono-nerd yazi
-yay -S --needed --noconfirm google-chrome visual-studio-code-bin
+sudo pacman -S --needed --noconfirm pacman-contrib age eza curl fzf bat jq ghostty htop btop less rsync tmux zoxide zsh 7zip qbittorrent openssh networkmanager ttf-jetbrains-mono-nerd yazi zsh-syntax-highlighting zsh-autosuggestions zsh-history-substring-search
+yay -S --needed --noconfirm google-chrome visual-studio-code-bin zsh-theme-powerlevel10k
 
 # ---------- Fonts ----------
 echo "Setting up fonts"
 mkdir -p "$HOME/.local/share/fonts"
 cp -r "$DOTFILES_DIR/fonts"/* "$HOME/.local/share/fonts"
-fc-cache -fv
+fc-cache -f
 
 # --------- Maintenance ----------
 sudo systemctl enable --now fstrim.timer
@@ -38,15 +38,12 @@ cp "$DOTFILES_DIR/config/.gitconfig" "$HOME/"
 cp "$DOTFILES_DIR/config/.zshrc" "$HOME/"
 cp "$DOTFILES_DIR/config/.p10k.zsh" "$HOME/"
 
-sudo pacman -S --needed --noconfirm zsh-syntax-highlighting zsh-autosuggestions zsh-history-substring-search
-yay -S --needed --noconfirm zsh-theme-powerlevel10k
-
 if [[ "$(getent passwd "$USER" | cut -d: -f7)" != */zsh ]]; then
   sudo chsh -s "$(command -v zsh)" "$USER"
 fi
 
 # ---------- Tmux ----------
 cp "$DOTFILES_DIR/config/.tmux.conf" "$HOME/"
-sudo loginctl enable-linger $USER
+sudo loginctl enable-linger "$USER"
 
 echo "Main setup complete! Please RESTART your PC."

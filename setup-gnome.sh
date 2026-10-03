@@ -52,22 +52,7 @@ echo "Installing GNOME extensions..."
 sudo pacman -S --needed --noconfirm gnome-browser-connector
 yay -S --needed --noconfirm gradia
 
-
-# 1. Dash to Dock
-# gnome-browser-connector "gnome-extensions://dash-to-dock%40micxgx.gmail.com/?action=install"
-# export GSETTINGS_SCHEMA_DIR=$HOME/.local/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/schemas/
-# read -p "Press Enter to configure Dash to Dock settings..."
-# gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup "true"
-# gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor "true"
-# gsettings set org.gnome.shell.extensions.dash-to-dock require-pressure-to-show "false"
-# gsettings set org.gnome.shell.extensions.dash-to-dock scroll-action "'cycle-windows'"
-# gsettings set org.gnome.shell.extensions.dash-to-dock shortcut-timeout "5.0"
-# gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "'DYNAMIC'"
-
-# 2. Clipboard indicator
-# gnome-browser-connector "gnome-extensions://clipboard-indicator%40tudmotu.com/?action=install"
-
-# 3. Window Width
+# 1. Window Width
 WINDOW_WIDTH_DIR="$HOME/.local/share/gnome-shell/extensions/window-width@adaspt"
 if [ ! -d "$WINDOW_WIDTH_DIR/.git" ]; then
   git clone git@github.com:adaspt/gnome-shell-extension-window-width.git "$WINDOW_WIDTH_DIR"
@@ -75,7 +60,7 @@ else
   git -C "$WINDOW_WIDTH_DIR" pull --ff-only
 fi
 
-# 4. Focus Ring
+# 2. Focus Ring
 FOCUS_RING_DIR="$HOME/.local/share/gnome-shell/extensions/focus-ring@adaspt"
 if [ ! -d "$FOCUS_RING_DIR/.git" ]; then
   git clone git@github.com:adaspt/gnome-shell-extension-focus-ring.git "$FOCUS_RING_DIR"

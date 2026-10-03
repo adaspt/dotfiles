@@ -131,7 +131,7 @@ command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
 [[ ! -f /usr/share/nvm/init-nvm.sh ]] || source /usr/share/nvm/init-nvm.sh
 
 # ---------- Custom ----------
-path+=('/home/adas/.dotnet/tools')
+path+=("$HOME/.dotnet/tools")
 export PATH
 
 export DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=1000
