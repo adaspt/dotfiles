@@ -33,17 +33,17 @@ fc-cache -f
 sudo systemctl enable --now fstrim.timer
 sudo systemctl enable --now paccache.timer
 
-# ---------- ZSH ----------
-cp "$DOTFILES_DIR/config/.gitconfig" "$HOME/"
-cp "$DOTFILES_DIR/config/.zshrc" "$HOME/"
-cp "$DOTFILES_DIR/config/.p10k.zsh" "$HOME/"
+# ---------- Dotfiles ----------
+for f in .gitconfig .zshrc .p10k.zsh .tmux.conf; do
+  ln -sf "$DOTFILES_DIR/config/$f" "$HOME/$f"
+done
 
+# ---------- ZSH ----------
 if [[ "$(getent passwd "$USER" | cut -d: -f7)" != */zsh ]]; then
   sudo chsh -s "$(command -v zsh)" "$USER"
 fi
 
 # ---------- Tmux ----------
-cp "$DOTFILES_DIR/config/.tmux.conf" "$HOME/"
 sudo loginctl enable-linger "$USER"
 
 echo "Main setup complete! Please RESTART your PC."

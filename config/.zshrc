@@ -128,10 +128,14 @@ bindkey '^[[Z' undo                             # Shift+Tab for undo
 command -v fzf >/dev/null && source <(fzf --zsh)
 command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# ---------- Development ----------
 [[ ! -f /usr/share/nvm/init-nvm.sh ]] || source /usr/share/nvm/init-nvm.sh
 
-# ---------- Custom ----------
 path+=("$HOME/.dotnet/tools")
 export PATH
 
 export DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=1000
+
+# ---------- Local overrides (machine-specific, not in repo) ----------
+[[ ! -f ~/.zshrc.local ]] || source ~/.zshrc.local
