@@ -124,6 +124,12 @@ bindkey '^[[B' history-substring-search-down
 bindkey '^[[Z' undo                             # Shift+Tab for undo
 
 
+# ---------- Path ----------
+typeset -U path
+path=("$HOME/.local/bin" $path)
+path=($path "$HOME/.dotnet/tools")
+
+
 # ---------- CLI integrations ----------
 command -v fzf >/dev/null && source <(fzf --zsh)
 command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
@@ -131,9 +137,6 @@ command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
 
 # ---------- Development ----------
 [[ ! -f /usr/share/nvm/init-nvm.sh ]] || source /usr/share/nvm/init-nvm.sh
-
-path+=("$HOME/.dotnet/tools")
-export PATH
 
 export DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=1000
 
