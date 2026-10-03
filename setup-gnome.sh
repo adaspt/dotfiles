@@ -16,6 +16,13 @@ gsettings set org.gnome.desktop.session idle-delay 480
 gsettings set org.gnome.desktop.screensaver lock-delay 120
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
 
+# Battery charging - Preserve Battery Health (stored by UPower, not gsettings)
+for battery in $(upower -e | grep battery_); do
+  upower -i "$battery" | grep -q 'charge-threshold-supported: *yes' || continue
+  gdbus call --system --dest org.freedesktop.UPower --object-path "$battery" \
+    --method org.freedesktop.UPower.Device.EnableChargeThreshold true >/dev/null
+done
+
 # 3. Desktop preferences
 gsettings set org.gnome.desktop.interface enable-hot-corners false
 gsettings set org.gnome.desktop.interface cursor-size 32
@@ -23,6 +30,8 @@ gsettings set org.gnome.desktop.search-providers disable-external true
 gsettings set org.gnome.desktop.peripherals.keyboard numlock-state "true"
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'lt')]"
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
+gsettings set org.gtk.gtk4.Settings.FileChooser show-hidden true
+gsettings set org.gtk.gtk4.Settings.FileChooser sort-directories-first true
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>e']"
 gsettings set org.gnome.shell favorite-apps "['org.gnome.Calculator.desktop', 'com.mitchellh.ghostty.desktop', 'com.anthropic.Claude.desktop', 'chatgpt.desktop', 'org.gnome.TextEditor.desktop', 'com.microsoft.VSCode.desktop', 'google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop']"
 
@@ -43,6 +52,10 @@ gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
 gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
 gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
 gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode 'FIXED'
+
+# 7. Desktop Icons - hide Home folder; Tiling Assistant - no popup after tiling a window
+gsettings set org.gnome.shell.extensions.ding show-home false
+gsettings set org.gnome.shell.extensions.tiling-assistant enable-tiling-popup false
 
 
 # ---------- GNOME Extensions ----------
