@@ -136,7 +136,8 @@ command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # ---------- Development ----------
-[[ ! -f /usr/share/nvm/init-nvm.sh ]] || source /usr/share/nvm/init-nvm.sh
+export NVM_DIR="$HOME/.nvm"
+[[ ! -s "$NVM_DIR/nvm.sh" ]] || source "$NVM_DIR/nvm.sh"
 
 export DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=1000
 
