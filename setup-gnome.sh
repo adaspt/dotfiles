@@ -22,7 +22,6 @@ gsettings set org.gnome.desktop.interface cursor-size 32
 gsettings set org.gnome.desktop.search-providers disable-external true
 gsettings set org.gnome.desktop.peripherals.keyboard numlock-state "true"
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'lt')]"
-gsettings set org.gnome.desktop.input-sources xkb-options "['grp:alt_shift_toggle']"
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>e']"
 gsettings set org.gnome.shell favorite-apps "['chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop', 'com.mitchellh.ghostty.desktop', 'google-chrome.desktop', 'code.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop']"
