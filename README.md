@@ -16,6 +16,7 @@
 - Set wallpaper
 - Show hidden files and sort directories first on Nautilus
 - If needed - install development frameworks
+- setup-onedrive
 
 # Other useful commands
 
