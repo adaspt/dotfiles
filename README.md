@@ -1,6 +1,6 @@
 # Setup
 
-- bash -c "$(curl -fsSL https://raw.githubusercontent.com/adaspt/dotfiles/main/setup.sh)"
+- bash -c "$(wget -qO- https://raw.githubusercontent.com/adaspt/dotfiles/ubuntu/setup.sh)"
 - Restart
 - For laptop disable nvidia and wakeup
 - Restart

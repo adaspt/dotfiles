@@ -89,18 +89,18 @@ function y() {
 }
 
 # ---------- Theme ----------
-[[ -f "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme" ]] &&
-  source "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
+[[ -f "$HOME/.local/share/powerlevel10k/powerlevel10k.zsh-theme" ]] &&
+  source "$HOME/.local/share/powerlevel10k/powerlevel10k.zsh-theme"
 
 # ---------- Optional plugins ----------
-[[ -f "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
-  source "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+[[ -f "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
+  source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
-[[ -f "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
-  source "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+[[ -f "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
+  source "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
-[[ -f "/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh" ]] &&
-  source "/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+[[ -f "$HOME/.local/share/zsh-history-substring-search/zsh-history-substring-search.zsh" ]] &&
+  source "$HOME/.local/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
 
 
 # ---------- Keybindings ----------
