@@ -24,7 +24,7 @@ gsettings set org.gnome.desktop.peripherals.keyboard numlock-state "true"
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'lt')]"
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>e']"
-gsettings set org.gnome.shell favorite-apps "['chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop', 'com.mitchellh.ghostty.desktop', 'google-chrome.desktop', 'com.microsoft.VSCode.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Calculator.desktop']"
+gsettings set org.gnome.shell favorite-apps "['org.gnome.Calculator.desktop', 'com.mitchellh.ghostty.desktop', 'com.anthropic.Claude.desktop', 'chatgpt.desktop', 'org.gnome.TextEditor.desktop', 'com.microsoft.VSCode.desktop', 'google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop']"
 
 # 4. Create shortcut "Screenshot with Gradia interactive" (Shift+Super+s)
 GRADIA_SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
@@ -38,10 +38,11 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GR
 gsettings set org.gnome.desktop.wm.keybindings switch-group "['<Alt>F6']"
 gsettings set org.gnome.desktop.wm.keybindings cycle-group "['<Super>Above_Tab']"
 
-# 6. Ubuntu Dock - bottom, auto-hide, not full width
+# 6. Ubuntu Dock - bottom, auto-hide, not full width, fixed transparency
 gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
 gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
 gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
+gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode 'FIXED'
 
 
 # ---------- GNOME Extensions ----------
@@ -49,6 +50,18 @@ echo "Installing GNOME extensions..."
 
 sudo apt-get install -y gnome-browser-connector
 flatpak install -y --noninteractive --system flathub be.alexandervanhee.gradia
+
+# Happy Appy Hotkey settings - dconf (not gsettings) works before the extension and its schema are installed
+dconf load /org/gnome/shell/extensions/happy-appy-hotkey/ <<'EOF'
+[/]
+number=3
+app-0='google-chrome.desktop'
+hotkey-0=['<Shift><Super>b']
+app-1='com.mitchellh.ghostty.desktop'
+hotkey-1=['<Super>Return']
+app-2='com.microsoft.VSCode.desktop'
+hotkey-2=['<Shift><Super>Return']
+EOF
 
 # 1. From extensions.gnome.org (Happy Appy Hotkey, Caffeine) - confirm each install dialog
 for uuid in happy-appy-hotkey@jqno.nl caffeine@patapon.info; do

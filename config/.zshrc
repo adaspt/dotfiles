@@ -88,19 +88,27 @@ function y() {
   rm -f -- "$tmp"
 }
 
+# ---------- Path ----------
+typeset -U path
+path=("$HOME/.local/bin" $path)
+path=($path "$HOME/.dotnet/tools")
+
+
+# ---------- Development ----------
+export NVM_DIR="$HOME/.nvm"
+[[ ! -s "$NVM_DIR/nvm.sh" ]] || source "$NVM_DIR/nvm.sh"
+
+export DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=1000
+
+
 # ---------- Theme ----------
 [[ -f "$HOME/.local/share/powerlevel10k/powerlevel10k.zsh-theme" ]] &&
   source "$HOME/.local/share/powerlevel10k/powerlevel10k.zsh-theme"
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# ---------- Optional plugins ----------
-[[ -f "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
-  source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
-[[ -f "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
-  source "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-
-[[ -f "$HOME/.local/share/zsh-history-substring-search/zsh-history-substring-search.zsh" ]] &&
-  source "$HOME/.local/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
+# ---------- fzf (defines widgets, so before syntax highlighting) ----------
+command -v fzf >/dev/null && source <(fzf --zsh)
 
 
 # ---------- Keybindings ----------
@@ -124,22 +132,20 @@ bindkey '^[[B' history-substring-search-down
 bindkey '^[[Z' undo                             # Shift+Tab for undo
 
 
-# ---------- Path ----------
-typeset -U path
-path=("$HOME/.local/bin" $path)
-path=($path "$HOME/.dotnet/tools")
+# ---------- Optional plugins (syntax highlighting after all widgets, history-substring-search after it) ----------
+[[ -f "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
+  source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+
+[[ -f "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
+  source "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+[[ -f "$HOME/.local/share/zsh-history-substring-search/zsh-history-substring-search.zsh" ]] &&
+  source "$HOME/.local/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
 
 
-# ---------- CLI integrations ----------
-command -v fzf >/dev/null && source <(fzf --zsh)
+# ---------- zoxide (last integration, so nothing replaces its cd hook) ----------
 command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# ---------- Development ----------
-export NVM_DIR="$HOME/.nvm"
-[[ ! -s "$NVM_DIR/nvm.sh" ]] || source "$NVM_DIR/nvm.sh"
-
-export DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=1000
 
 # ---------- Local overrides (machine-specific, not in repo) ----------
 [[ ! -f ~/.zshrc.local ]] || source ~/.zshrc.local
