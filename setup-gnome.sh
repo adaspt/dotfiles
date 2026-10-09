@@ -43,9 +43,8 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GR
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GRADIA_SHORTCUT_PATH command "flatpak run be.alexandervanhee.gradia --screenshot=INTERACTIVE"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GRADIA_SHORTCUT_PATH binding "<Shift><Super>s"
 
-# 5. Switch windows of application
-gsettings set org.gnome.desktop.wm.keybindings switch-group "['<Alt>F6']"
-gsettings set org.gnome.desktop.wm.keybindings cycle-group "['<Super>Above_Tab']"
+# 5. Close window
+gsettings set org.gnome.desktop.wm.keybindings close "['<Super>w']"
 
 # 6. Ubuntu Dock - bottom, auto-hide, not full width, fixed transparency
 gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
@@ -67,13 +66,21 @@ flatpak install -y --noninteractive --system flathub be.alexandervanhee.gradia
 # Happy Appy Hotkey settings - dconf (not gsettings) works before the extension and its schema are installed
 dconf load /org/gnome/shell/extensions/happy-appy-hotkey/ <<'EOF'
 [/]
-number=3
-app-0='google-chrome.desktop'
-hotkey-0=['<Shift><Super>b']
-app-1='com.mitchellh.ghostty.desktop'
-hotkey-1=['<Super>Return']
-app-2='com.microsoft.VSCode.desktop'
-hotkey-2=['<Shift><Super>Return']
+number=7
+app-0='com.mitchellh.ghostty.desktop'
+hotkey-0=['<Super>Return']
+app-1='com.anthropic.Claude.desktop'
+hotkey-1=['<Shift><Super>a']
+app-2='chatgpt.desktop'
+hotkey-2=['<Shift><Super>i']
+app-3='google-chrome.desktop'
+hotkey-3=['<Shift><Super>w']
+app-4='com.microsoft.VSCode.desktop'
+hotkey-4=['<Shift><Super>Return']
+app-5='chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop'
+hotkey-5=['<Shift><Super>m']
+app-6='org.gnome.TextEditor.desktop'
+hotkey-6=['<Shift><Super>n']
 EOF
 
 # 1. From extensions.gnome.org (Happy Appy Hotkey, Caffeine) - confirm each install dialog
