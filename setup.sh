@@ -73,4 +73,12 @@ fs.inotify.max_user_instances=1024' | sudo tee /etc/sysctl.d/99-inotify.conf >/d
   sudo sysctl --system >/dev/null
 fi
 
+# ---------- Boot log instead of the Plymouth splash ----------
+sudo grubby --update-kernel=ALL --remove-args="rhgb quiet"
+
+# ---------- Remove the profile picture generated on first boot ----------
+# An empty path makes AccountsService delete it, same as "Remove Picture" in GNOME Settings
+gdbus call --system --dest org.freedesktop.Accounts --object-path "/org/freedesktop/Accounts/User$(id -u)" \
+  --method org.freedesktop.Accounts.User.SetIconFile "" >/dev/null
+
 echo "Main setup complete! Please RESTART your PC."
