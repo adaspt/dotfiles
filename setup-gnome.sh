@@ -4,6 +4,9 @@ set -euo pipefail
 # GNOME-specific settings and extension installation.
 # Run this only on a GNOME session or when GNOME is available.
 
+# ---------- Packages (extensions first: their gsettings schemas are needed below) ----------
+sudo dnf install -y gnome-browser-connector gnome-shell-extension-dash-to-dock gnome-shell-extension-caffeine
+
 # ---------- GNOME Settings ----------
 echo "Configuring GNOME desktop preferences..."
 
@@ -33,7 +36,7 @@ gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
 gsettings set org.gtk.gtk4.Settings.FileChooser show-hidden true
 gsettings set org.gtk.gtk4.Settings.FileChooser sort-directories-first true
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>e']"
-gsettings set org.gnome.shell favorite-apps "['org.gnome.Calculator.desktop', 'com.mitchellh.ghostty.desktop', 'com.anthropic.Claude.desktop', 'chatgpt.desktop', 'org.gnome.TextEditor.desktop', 'com.microsoft.VSCode.desktop', 'google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop']"
+gsettings set org.gnome.shell favorite-apps "['org.gnome.Calculator.desktop', 'com.mitchellh.ghostty.desktop', 'claude-desktop-unofficial.desktop', 'chatgpt.desktop', 'org.gnome.TextEditor.desktop', 'com.microsoft.VSCode.desktop', 'google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop']"
 
 # 4. Create shortcut "Screenshot with Gradia interactive" (Shift+Super+s)
 GRADIA_SHORTCUT_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
@@ -46,31 +49,19 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$GR
 # 5. Close window
 gsettings set org.gnome.desktop.wm.keybindings close "['<Super>w']"
 
-# 6. Ubuntu Dock - bottom, auto-hide, not full width, fixed transparency
+# 6. Dash to Dock - bottom, auto-hide, not full width, fixed transparency
 gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
 gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
 gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
 gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode 'FIXED'
 
-# 7. Desktop Icons - hide Home folder; Tiling Assistant - no popup after tiling a window
-gsettings set org.gnome.shell.extensions.ding show-home false
-gsettings set org.gnome.shell.extensions.tiling-assistant enable-tiling-popup false
-
 
 # ---------- GNOME Extensions ----------
 echo "Installing GNOME extensions..."
 
-sudo apt-get install -y gnome-browser-connector
 flatpak install -y --noninteractive --system flathub be.alexandervanhee.gradia
 
-# 1. From extensions.gnome.org (Caffeine) - confirm the install dialog
-for uuid in caffeine@patapon.info; do
-  gnome-extensions list | grep -qxF "$uuid" && continue
-  gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell \
-    --method org.gnome.Shell.Extensions.InstallRemoteExtension "$uuid"
-done
-
-# 2. Launcher - cloned to personal projects, symlinked into the extensions dir
+# Launcher - cloned to personal projects, symlinked into the extensions dir
 LAUNCHER_DIR="$HOME/Projects/personal/gnome-shell-extension-launcher"
 EXTENSIONS_DIR="$HOME/.local/share/gnome-shell/extensions"
 if [ ! -d "$LAUNCHER_DIR/.git" ]; then

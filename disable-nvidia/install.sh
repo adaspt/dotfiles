@@ -28,7 +28,7 @@ udevadm control --reload-rules
 udevadm trigger
 
 echo "⚙️  Regenerating initramfs images..."
-update-initramfs -u -k all
+dracut --regenerate-all --force
 
 echo "✅ NVIDIA isolation setup completed."
 echo "🔄 Please reboot your system to fully apply changes."

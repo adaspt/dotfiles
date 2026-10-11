@@ -3,51 +3,44 @@ set -euo pipefail
 
 DOTFILES_DIR="$HOME/Projects/personal/dotfiles"
 
-sudo apt-get update
-sudo apt-get full-upgrade -y
-sudo apt-get install -y git curl
-
-install_deb() {
-  local name="$1" url="$2" tmp
-  if ! dpkg -s "$name" &> /dev/null; then
-    tmp=$(mktemp --suffix=.deb)
-    curl -fsSL -o "$tmp" "$url"
-    chmod 644 "$tmp"
-    sudo apt-get install -y "$tmp"
-    rm -f "$tmp"
-  fi
-}
+sudo dnf upgrade -y --refresh
+sudo dnf install -y git curl dnf5-plugins
 
 mkdir -p "$DOTFILES_DIR"
 if [ ! -d "$DOTFILES_DIR/.git" ]; then
-  git clone -b ubuntu https://github.com/adaspt/dotfiles.git "$DOTFILES_DIR"
+  git clone -b fedora https://github.com/adaspt/dotfiles.git "$DOTFILES_DIR"
   git -C "$DOTFILES_DIR" remote set-url origin git@github.com:adaspt/dotfiles.git
 fi
 
-if [ ! -f /etc/apt/sources.list.d/yazi.list ]; then
-  curl -fsSL https://yazi-rs.github.io/builds/yazi-keyring.gpg | sudo tee /usr/share/keyrings/yazi-keyring.gpg >/dev/null
-  echo 'deb [signed-by=/usr/share/keyrings/yazi-keyring.gpg] https://yazi-rs.github.io/builds/ stable main' | sudo tee /etc/apt/sources.list.d/yazi.list >/dev/null
-  sudo apt-get update
+# Not in the Fedora repos: Ghostty and Yazi (COPR), Chrome (Google's repo, shipped disabled), VS Code (Microsoft's repo)
+sudo dnf copr enable -y scottames/ghostty
+sudo dnf copr enable -y lihaohong/yazi
+sudo dnf install -y fedora-workstation-repositories
+sudo dnf config-manager setopt google-chrome.enabled=1
+if [ ! -f /etc/yum.repos.d/vscode.repo ]; then
+  sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+  echo "[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+autorefresh=1
+type=rpm-md
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.repos.d/vscode.repo >/dev/null
 fi
 
-sudo apt-get install -y age eza fzf bat ghostty htop btop tmux zoxide zsh 7zip qbittorrent openssh-server zsh-syntax-highlighting zsh-autosuggestions yazi fd-find ripgrep wl-clipboard flatpak
+sudo dnf install -y age eza fzf bat ghostty htop btop tmux zoxide zsh 7zip qbittorrent openssh-server zsh-syntax-highlighting zsh-autosuggestions yazi fd-find ripgrep wl-clipboard flatpak google-chrome-stable code
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
-# Chrome and VS Code .debs add their own apt repos for updates
-install_deb google-chrome-stable https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-echo "code code/add-microsoft-repo boolean true" | sudo debconf-set-selections
-install_deb code "https://update.code.visualstudio.com/latest/linux-deb-x64/stable"
+# Fedora doesn't start sshd on install
+sudo systemctl enable --now sshd
 
-# Not packaged for Ubuntu
+# Not packaged for Fedora
 mkdir -p "$HOME/.local/share" "$HOME/.local/bin"
 [ -d "$HOME/.local/share/powerlevel10k" ] ||
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$HOME/.local/share/powerlevel10k"
 [ -d "$HOME/.local/share/zsh-history-substring-search" ] ||
   git clone --depth=1 https://github.com/zsh-users/zsh-history-substring-search.git "$HOME/.local/share/zsh-history-substring-search"
-
-# Ubuntu ships bat as batcat and fd as fdfind
-ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"
-ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd"
 
 # ---------- Fonts ----------
 echo "Setting up fonts"
@@ -67,10 +60,17 @@ done
 
 # ---------- ZSH ----------
 if [[ "$(getent passwd "$USER" | cut -d: -f7)" != */zsh ]]; then
-  sudo chsh -s "$(command -v zsh)" "$USER"
+  sudo usermod -s "$(command -v zsh)" "$USER"
 fi
 
 # ---------- Tmux ----------
 sudo loginctl enable-linger "$USER"
+
+# ---------- inotify limits (large OneDrive trees, dev file watchers such as dotnet watch) ----------
+if [ ! -f /etc/sysctl.d/99-inotify.conf ]; then
+  echo 'fs.inotify.max_user_watches=524288
+fs.inotify.max_user_instances=1024' | sudo tee /etc/sysctl.d/99-inotify.conf >/dev/null
+  sudo sysctl --system >/dev/null
+fi
 
 echo "Main setup complete! Please RESTART your PC."

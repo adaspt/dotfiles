@@ -1,6 +1,6 @@
 # Setup
 
-- bash -c "$(wget -qO- https://raw.githubusercontent.com/adaspt/dotfiles/ubuntu/setup.sh)"
+- bash -c "$(wget -qO- https://raw.githubusercontent.com/adaspt/dotfiles/fedora/setup.sh)"
 - Restart
 - For laptop disable nvidia and wakeup
 - Restart
@@ -12,7 +12,7 @@
 - setup-gnome
 - Restart
 - Enable extensions
-- sudo chfn -f "Adas Petrovas" $USER
+- sudo usermod -c "Adas Petrovas" $USER
 - Set wallpaper
 - If needed - install development frameworks
 - setup-onedrive
