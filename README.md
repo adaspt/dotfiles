@@ -3,6 +3,7 @@
 - bash -c "$(wget -qO- https://raw.githubusercontent.com/adaspt/dotfiles/fedora/setup.sh)"
 - Restart
 - For laptop disable nvidia and wakeup, setup-intel
+- For PC with nvidia card setup-nvidia
 - Restart
 - Configure monitors
 - setup-gdm-greeter
