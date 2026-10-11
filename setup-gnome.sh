@@ -63,45 +63,21 @@ echo "Installing GNOME extensions..."
 sudo apt-get install -y gnome-browser-connector
 flatpak install -y --noninteractive --system flathub be.alexandervanhee.gradia
 
-# Happy Appy Hotkey settings - dconf (not gsettings) works before the extension and its schema are installed
-dconf load /org/gnome/shell/extensions/happy-appy-hotkey/ <<'EOF'
-[/]
-number=7
-app-0='com.mitchellh.ghostty.desktop'
-hotkey-0=['<Super>Return']
-app-1='com.anthropic.Claude.desktop'
-hotkey-1=['<Shift><Super>a']
-app-2='chatgpt.desktop'
-hotkey-2=['<Shift><Super>i']
-app-3='google-chrome.desktop'
-hotkey-3=['<Shift><Super>w']
-app-4='com.microsoft.VSCode.desktop'
-hotkey-4=['<Shift><Super>Return']
-app-5='chrome-ompifgpmddkgmclendfeacglnodjjndh-Default.desktop'
-hotkey-5=['<Shift><Super>m']
-app-6='org.gnome.TextEditor.desktop'
-hotkey-6=['<Shift><Super>n']
-EOF
-
-# 1. From extensions.gnome.org (Happy Appy Hotkey, Caffeine) - confirm each install dialog
-for uuid in happy-appy-hotkey@jqno.nl caffeine@patapon.info; do
+# 1. From extensions.gnome.org (Caffeine) - confirm the install dialog
+for uuid in caffeine@patapon.info; do
   gnome-extensions list | grep -qxF "$uuid" && continue
   gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell \
     --method org.gnome.Shell.Extensions.InstallRemoteExtension "$uuid"
 done
 
-# 2. Window Width
-WINDOW_WIDTH_DIR="$HOME/.local/share/gnome-shell/extensions/window-width@adaspt"
-if [ ! -d "$WINDOW_WIDTH_DIR/.git" ]; then
-  git clone git@github.com:adaspt/gnome-shell-extension-window-width.git "$WINDOW_WIDTH_DIR"
+# 2. Launcher - cloned to personal projects, symlinked into the extensions dir
+LAUNCHER_DIR="$HOME/Projects/personal/gnome-shell-extension-launcher"
+EXTENSIONS_DIR="$HOME/.local/share/gnome-shell/extensions"
+if [ ! -d "$LAUNCHER_DIR/.git" ]; then
+  mkdir -p "$(dirname "$LAUNCHER_DIR")"
+  git clone git@github.com:adaspt/gnome-shell-extension-launcher.git "$LAUNCHER_DIR"
 else
-  git -C "$WINDOW_WIDTH_DIR" pull --ff-only
+  git -C "$LAUNCHER_DIR" pull --ff-only
 fi
-
-# 3. Focus Ring
-FOCUS_RING_DIR="$HOME/.local/share/gnome-shell/extensions/focus-ring@adaspt"
-if [ ! -d "$FOCUS_RING_DIR/.git" ]; then
-  git clone git@github.com:adaspt/gnome-shell-extension-focus-ring.git "$FOCUS_RING_DIR"
-else
-  git -C "$FOCUS_RING_DIR" pull --ff-only
-fi
+mkdir -p "$EXTENSIONS_DIR"
+ln -sfnT "$LAUNCHER_DIR" "$EXTENSIONS_DIR/launcher@adaspt"
