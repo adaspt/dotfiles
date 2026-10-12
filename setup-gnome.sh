@@ -5,7 +5,7 @@ set -euo pipefail
 # Run this only on a GNOME session or when GNOME is available.
 
 # ---------- Packages (extensions first: their gsettings schemas are needed below) ----------
-sudo dnf install -y gnome-browser-connector gnome-shell-extension-dash-to-dock gnome-shell-extension-caffeine
+sudo dnf install -y gnome-browser-connector gnome-shell-extension-dash-to-dock gnome-shell-extension-caffeine gnome-shell-extension-appindicator
 
 # ---------- GNOME Settings ----------
 echo "Configuring GNOME desktop preferences..."
