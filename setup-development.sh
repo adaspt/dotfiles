@@ -11,6 +11,10 @@ sudo dnf install -y azure-cli dotnet-sdk-10.0 claude-desktop-unofficial qemu-sys
 # Claude Desktop Cowork needs /dev/kvm and /dev/vhost-vsock (takes effect after re-login)
 id -nG "$USER" | grep -qw kvm || sudo usermod -aG kvm "$USER"
 
+# Native Wayland instead of XWayland: its X11 window left open at logout makes GNOME Shell hang on shutdown (takes effect after re-login)
+mkdir -p "$HOME/.config/environment.d"
+echo 'CLAUDE_USE_WAYLAND=1' > "$HOME/.config/environment.d/claude.conf"
+
 # ---------- ChatGPT ----------
 rpm -q chatgpt &> /dev/null ||
   sudo dnf install -y https://persistent.oaistatic.com/codex-app-prod/linux/rpm/latest/chatgpt.x86_64.rpm
