@@ -5,6 +5,12 @@ set -euo pipefail
 [ -f /etc/yum.repos.d/claude-desktop-unofficial.repo ] ||
   sudo curl -fsSLo /etc/yum.repos.d/claude-desktop-unofficial.repo https://pkg.claude-desktop-debian.dev/rpm/claude-desktop-unofficial.repo
 
+# ---------- Azure CLI (Microsoft's RHEL 10 repo; Fedora's package lags behind) ----------
+rpm -q packages-microsoft-prod &> /dev/null || {
+  sudo rpm --import https://packages.microsoft.com/keys/microsoft-2025.asc
+  sudo dnf install -y https://packages.microsoft.com/config/rhel/10/packages-microsoft-prod.rpm
+}
+
 # The rpm doesn't pull in the QEMU stack Cowork runs on
 sudo dnf install -y azure-cli dotnet-sdk-10.0 claude-desktop-unofficial qemu-system-x86-core edk2-ovmf virtiofsd
 
