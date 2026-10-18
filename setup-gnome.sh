@@ -72,3 +72,14 @@ else
 fi
 mkdir -p "$EXTENSIONS_DIR"
 ln -sfnT "$LAUNCHER_DIR" "$EXTENSIONS_DIR/launcher@adaspt"
+
+# PR Monitor - same approach; compiled schemas are gitignored, so build them after clone/pull
+PR_MONITOR_DIR="$HOME/Projects/personal/gnome-shell-extension-pr-monitor"
+if [ ! -d "$PR_MONITOR_DIR/.git" ]; then
+  mkdir -p "$(dirname "$PR_MONITOR_DIR")"
+  git clone git@github.com:adaspt/gnome-shell-extension-pr-monitor.git "$PR_MONITOR_DIR"
+else
+  git -C "$PR_MONITOR_DIR" pull --ff-only
+fi
+glib-compile-schemas --strict "$PR_MONITOR_DIR/schemas"
+ln -sfnT "$PR_MONITOR_DIR" "$EXTENSIONS_DIR/pr-monitor@adaspt"

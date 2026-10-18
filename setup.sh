@@ -57,6 +57,9 @@ fc-cache -f
 for f in .gitconfig .zshrc .p10k.zsh .tmux.conf; do
   ln -sf "$DOTFILES_DIR/config/$f" "$HOME/$f"
 done
+mkdir -p "$HOME/.claude"
+ln -sf "$DOTFILES_DIR/config/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+ln -sf "$DOTFILES_DIR/config/settings.json" "$HOME/.claude/settings.json"
 
 # ---------- ZSH ----------
 if [[ "$(getent passwd "$USER" | cut -d: -f7)" != */zsh ]]; then
