@@ -28,5 +28,8 @@ rpm -q chatgpt &> /dev/null ||
 # ---------- Claude Code (native install, auto-updates) ----------
 [ -x "$HOME/.local/bin/claude" ] || curl -fsSL https://claude.ai/install.sh | bash
 
+# ---------- Codex CLI (native install) ----------
+[ -x "$HOME/.local/bin/codex" ] || curl -fsSL https://chatgpt.com/codex/install.sh | sh
+
 # ---------- nvm (PROFILE=/dev/null: .zshrc already loads it) ----------
 [ -d "$HOME/.nvm" ] || curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | PROFILE=/dev/null bash
