@@ -61,25 +61,20 @@ echo "Installing GNOME extensions..."
 
 flatpak install -y --noninteractive --system flathub be.alexandervanhee.gradia
 
-# Launcher - cloned to personal projects, symlinked into the extensions dir
-LAUNCHER_DIR="$HOME/Projects/personal/gnome-shell-extension-launcher"
+# Personal extensions - cloned to personal projects, symlinked into the extensions dir
 EXTENSIONS_DIR="$HOME/.local/share/gnome-shell/extensions"
-if [ ! -d "$LAUNCHER_DIR/.git" ]; then
-  mkdir -p "$(dirname "$LAUNCHER_DIR")"
-  git clone git@github.com:adaspt/gnome-shell-extension-launcher.git "$LAUNCHER_DIR"
-else
-  git -C "$LAUNCHER_DIR" pull --ff-only
-fi
 mkdir -p "$EXTENSIONS_DIR"
-ln -sfnT "$LAUNCHER_DIR" "$EXTENSIONS_DIR/launcher@adaspt"
-
-# PR Monitor - same approach; compiled schemas are gitignored, so build them after clone/pull
-PR_MONITOR_DIR="$HOME/Projects/personal/gnome-shell-extension-pr-monitor"
-if [ ! -d "$PR_MONITOR_DIR/.git" ]; then
-  mkdir -p "$(dirname "$PR_MONITOR_DIR")"
-  git clone git@github.com:adaspt/gnome-shell-extension-pr-monitor.git "$PR_MONITOR_DIR"
-else
-  git -C "$PR_MONITOR_DIR" pull --ff-only
-fi
-glib-compile-schemas --strict "$PR_MONITOR_DIR/schemas"
-ln -sfnT "$PR_MONITOR_DIR" "$EXTENSIONS_DIR/pr-monitor@adaspt"
+for NAME in launcher window-keys pr-monitor mail-monitor; do
+  DIR="$HOME/Projects/personal/gnome-shell-extension-$NAME"
+  if [ ! -d "$DIR/.git" ]; then
+    mkdir -p "$(dirname "$DIR")"
+    git clone "git@github.com:adaspt/gnome-shell-extension-$NAME.git" "$DIR"
+  else
+    git -C "$DIR" pull --ff-only
+  fi
+  # Compiled schemas are gitignored, so build them after clone/pull
+  if [ -d "$DIR/schemas" ]; then
+    glib-compile-schemas --strict "$DIR/schemas"
+  fi
+  ln -sfnT "$DIR" "$EXTENSIONS_DIR/$NAME@adaspt"
+done
