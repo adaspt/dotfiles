@@ -1,0 +1,9 @@
+# Installed by steps/dev.sh, after it adds the Microsoft and Claude Desktop repos
+azure-cli
+dotnet-sdk-10.0
+claude-desktop-unofficial
+
+# The Claude Desktop rpm doesn't pull in the QEMU stack Cowork runs on
+qemu-system-x86-core
+edk2-ovmf
+virtiofsd

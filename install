@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Sets up this PC. Safe to run again: every step checks what is already done.
+#
+#   ./install            run the default steps that aren't done yet, in order;
+#                        stops after a step that needs a restart - restart and run it again
+#   ./install STEP...    run these steps, done or not (also the optional ones)
+#   ./install status     show which steps are done
+set -euo pipefail
+
+DOTFILES_DIR="$(dirname "$(readlink -f "$0")")"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles"
+source "$DOTFILES_DIR/lib/common.sh"
+
+DEFAULT_STEPS=(hostname base hardware gdm ssh gnome)
+OPTIONAL_STEPS=(dev onedrive gaming)
+
+# Runs one step in its own bash process, so its variables and `exit` stay contained,
+# and `set -e` works inside it no matter how this function is called.
+# Sets RESTART=1 when the step asked for a restart.
+RESTART=""
+run_step() {
+  local step="$1"
+  local restart_flag="$STATE_DIR/$step.restart"
+  [ -f "$DOTFILES_DIR/steps/$step.sh" ] || die "Unknown step: $step (see ./install status)"
+
+  echo
+  echo "==> $step"
+  mkdir -p "$STATE_DIR"
+  rm -f "$restart_flag"
+  if ! DOTFILES_DIR="$DOTFILES_DIR" STATE_DIR="$STATE_DIR" RESTART_FLAG="$restart_flag" bash -c '
+    set -euo pipefail
+    source "$DOTFILES_DIR/lib/common.sh"
+    source "$DOTFILES_DIR/steps/$1.sh"
+  ' _ "$step"; then
+    die "Step '$step' failed. Fix the problem and run ./install again."
+  fi
+  touch "$STATE_DIR/$step.done"
+
+  if [ -f "$restart_flag" ]; then
+    echo
+    echo "Step '$step' is done. Please RESTART your PC:"
+    sed 's/^/  - /' "$restart_flag"
+    rm -f "$restart_flag"
+    RESTART=1
+  fi
+}
+
+status() {
+  local step mark
+  for step in "${DEFAULT_STEPS[@]}" "${OPTIONAL_STEPS[@]}"; do
+    mark="[ ]"
+    [ -f "$STATE_DIR/$step.done" ] && mark="[x]"
+    if [[ " ${OPTIONAL_STEPS[*]} " == *" $step "* ]]; then
+      echo "$mark $step (optional)"
+    else
+      echo "$mark $step"
+    fi
+  done
+}
+
+if [ "${1:-}" = "status" ]; then
+  status
+  exit 0
+fi
+
+if [ $# -gt 0 ]; then
+  for step in "$@"; do
+    run_step "$step"
+    [ -z "$RESTART" ] || exit 0
+  done
+  exit 0
+fi
+
+for step in "${DEFAULT_STEPS[@]}"; do
+  [ -f "$STATE_DIR/$step.done" ] && continue
+  run_step "$step"
+  if [ -n "$RESTART" ]; then
+    echo "Then run $DOTFILES_DIR/install again to continue."
+    exit 0
+  fi
+done
+
+echo
+echo "All default steps are done."
+echo "Optional: ./install dev | onedrive | gaming"
+echo "Still manual: set the wallpaper."

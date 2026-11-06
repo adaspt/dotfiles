@@ -1,25 +1,24 @@
-#!/usr/bin/env bash
-set -euo pipefail
+# Development tools (optional: ./install dev).
 
-# ---------- Claude Desktop (unofficial repackaging of Anthropic's .deb, no official Fedora package yet) ----------
+# ---------- Repos ----------
+# Claude Desktop: unofficial repackaging of Anthropic's .deb, no official Fedora package yet
 [ -f /etc/yum.repos.d/claude-desktop-unofficial.repo ] ||
   sudo curl -fsSLo /etc/yum.repos.d/claude-desktop-unofficial.repo https://pkg.claude-desktop-debian.dev/rpm/claude-desktop-unofficial.repo
 
-# ---------- Azure CLI (Microsoft's RHEL 10 repo; Fedora's package lags behind) ----------
+# Azure CLI: Microsoft's RHEL 10 repo, Fedora's package lags behind
 rpm -q packages-microsoft-prod &> /dev/null || {
   sudo rpm --import https://packages.microsoft.com/keys/microsoft-2025.asc
   sudo dnf install -y https://packages.microsoft.com/config/rhel/10/packages-microsoft-prod.rpm
 }
 
-# The rpm doesn't pull in the QEMU stack Cowork runs on
-sudo dnf install -y azure-cli dotnet-sdk-10.0 claude-desktop-unofficial qemu-system-x86-core edk2-ovmf virtiofsd
+install_packages dev
 
-# Claude Desktop Cowork needs /dev/kvm and /dev/vhost-vsock (takes effect after re-login)
+# ---------- Claude Desktop ----------
+# Cowork needs /dev/kvm and /dev/vhost-vsock
 id -nG "$USER" | grep -qw kvm || sudo usermod -aG kvm "$USER"
 
-# Native Wayland instead of XWayland: its X11 window left open at logout makes GNOME Shell hang on shutdown (takes effect after re-login)
-mkdir -p "$HOME/.config/environment.d"
-echo 'CLAUDE_USE_WAYLAND=1' > "$HOME/.config/environment.d/claude.conf"
+# Native Wayland instead of XWayland: its X11 window left open at logout makes GNOME Shell hang on shutdown
+link config/environment.d/claude.conf "$HOME/.config/environment.d/claude.conf"
 
 # ---------- ChatGPT ----------
 rpm -q chatgpt &> /dev/null ||
@@ -33,3 +32,5 @@ rpm -q chatgpt &> /dev/null ||
 
 # ---------- nvm (PROFILE=/dev/null: .zshrc already loads it) ----------
 [ -d "$HOME/.nvm" ] || curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | PROFILE=/dev/null bash
+
+needs_restart "log out and back in for the kvm group and CLAUDE_USE_WAYLAND"

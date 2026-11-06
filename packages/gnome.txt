@@ -1,0 +1,5 @@
+# Installed by steps/gnome.sh, before the dconf settings that configure them
+gnome-browser-connector
+gnome-shell-extension-dash-to-dock
+gnome-shell-extension-caffeine
+gnome-shell-extension-appindicator
