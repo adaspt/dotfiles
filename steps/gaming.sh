@@ -7,11 +7,10 @@ if ask "Install Steam?"; then
 fi
 
 if ask "Install GeForce NOW?"; then
-  DOWNLOADS_DIR="$(xdg-user-dir DOWNLOAD 2>/dev/null || echo "$HOME/Downloads")"
-  INSTALLER="$DOWNLOADS_DIR/GeForceNOWSetup.bin"
-
-  mkdir -p "$DOWNLOADS_DIR"
-  curl -fSL -o "$INSTALLER" https://international.download.nvidia.com/GFNLinux/GeForceNOWSetup.bin
-  chmod +x "$INSTALLER"
-  "$INSTALLER"
+  # The installer writes GeForceNOWSetup.log to its working directory, so run it in a temp dir
+  GFN_DIR="$(mktemp -d -t geforcenow.XXXXXX)"
+  curl -fSL -o "$GFN_DIR/GeForceNOWSetup.bin" https://international.download.nvidia.com/GFNLinux/GeForceNOWSetup.bin
+  chmod +x "$GFN_DIR/GeForceNOWSetup.bin"
+  (cd "$GFN_DIR" && ./GeForceNOWSetup.bin) || die "GeForce NOW install failed, see $GFN_DIR/GeForceNOWSetup.log"
+  rm -rf "$GFN_DIR"
 fi
