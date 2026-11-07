@@ -3,14 +3,32 @@
 
 # Extensions from Fedora's repos, enabled by config/gnome.ini below
 sudo dnf install -y gnome-browser-connector gnome-shell-extension-dash-to-dock \
-  gnome-shell-extension-caffeine gnome-shell-extension-appindicator
+  gnome-shell-extension-appindicator
 flatpak install -y --noninteractive --system flathub be.alexandervanhee.gradia
+
+EXTENSIONS_DIR="$HOME/.local/share/gnome-shell/extensions"
+mkdir -p "$EXTENSIONS_DIR"
+
+# ---------- Extensions from extensions.gnome.org ----------
+# Fedora's packages of these lag behind new GNOME releases and show as out of date.
+# Installed per user, GNOME Shell keeps them updated itself, and they win over a system copy with the same uuid
+ego_install() {
+  local uuid="$1" shell_version url tmp
+  [ -d "$EXTENSIONS_DIR/$uuid" ] && return 0
+  shell_version="$(gnome-shell --version | grep -oE '[0-9]+' | head -1)"
+  url="$(curl -fsSL "https://extensions.gnome.org/extension-info/?uuid=$uuid&shell_version=$shell_version" |
+    python3 -I -c 'import json, sys; print(json.load(sys.stdin)["download_url"])')" ||
+    die "$uuid has no version for GNOME Shell $shell_version on extensions.gnome.org"
+  tmp="$(mktemp -d)"
+  curl -fsSL -o "$tmp/$uuid.zip" "https://extensions.gnome.org$url"
+  gnome-extensions install --force "$tmp/$uuid.zip"
+  rm -rf "$tmp"
+}
+ego_install caffeine@patapon.info
 
 # ---------- Personal extensions ----------
 # Cloned to personal projects, symlinked into the extensions dir.
 # Over HTTPS, so no SSH key is needed yet; .gitconfig sends pushes over SSH
-EXTENSIONS_DIR="$HOME/.local/share/gnome-shell/extensions"
-mkdir -p "$EXTENSIONS_DIR"
 for NAME in launcher window-keys mail-monitor; do
   DIR="$HOME/Projects/personal/gnome-shell-extension-$NAME"
   if [ ! -d "$DIR/.git" ]; then

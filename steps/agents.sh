@@ -4,8 +4,9 @@
 [ -x "$HOME/.local/bin/claude" ] || curl -fsSL https://claude.ai/install.sh | bash
 
 # ---------- Codex CLI (native install) ----------
-# NON_INTERACTIVE: otherwise it ends with "Start Codex now?" and waits for an answer
-[ -x "$HOME/.local/bin/codex" ] || curl -fsSL https://chatgpt.com/codex/install.sh | NON_INTERACTIVE=1 sh
+# CODEX_NON_INTERACTIVE: otherwise it ends with "Start Codex now?" and waits for an answer
+# (it asks on /dev/tty, so piping the script into sh doesn't stop it)
+[ -x "$HOME/.local/bin/codex" ] || curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
 
 # ---------- T3 Code (AppImage) ----------
 # It updates itself by replacing this file, so the name has no version in it.
