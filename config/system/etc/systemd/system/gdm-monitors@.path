@@ -1,5 +1,5 @@
 # Copies the user's monitor layout to the login screen whenever it changes in Settings > Displays.
-# Enabled per user by steps/gdm.sh: gdm-monitors@USERNAME.path
+# Enabled per user by steps/gnome.sh: gdm-monitors@USERNAME.path
 [Unit]
 Description=Watch %i's monitor layout for the login screen
 

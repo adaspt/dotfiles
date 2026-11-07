@@ -1,4 +1,4 @@
-# OneDrive client syncing the folders in config/onedrive/sync_list. The ssh step after it reads Backup/.
+# OneDrive client syncing the folders in config/onedrive/sync_list. The ssh and vpn steps after it read Backup/.
 
 CONFIG_DIR="$HOME/.config/onedrive"
 
@@ -20,7 +20,7 @@ if ! systemctl --user is-enabled --quiet onedrive; then
     [ -f "$CONFIG_DIR/refresh_token" ] || die "OneDrive authentication failed"
   fi
 
-  # Only Backup/ now: the ssh step needs it, and the full first sync can take long.
+  # Only Backup/ now: the ssh and vpn steps need it, and the full first sync can take long.
   # The client demands --resync on the first sync with a sync_list (no saved state yet)
   onedrive --sync --single-directory Backup --resync --resync-auth --verbose
 

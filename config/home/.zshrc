@@ -130,11 +130,13 @@ bindkey '^[[Z' undo                             # Shift+Tab for undo
 
 
 # ---------- Optional plugins (syntax highlighting after all widgets, history-substring-search after it) ----------
-[[ -f "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
-  source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-
-[[ -f "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
-  source "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+# Fedora installs them in /usr/share/NAME, Arch in /usr/share/zsh/plugins/NAME
+for plugin in zsh-autosuggestions zsh-syntax-highlighting; do
+  for dir in /usr/share/$plugin /usr/share/zsh/plugins/$plugin; do
+    [[ -f "$dir/$plugin.zsh" ]] && { source "$dir/$plugin.zsh"; break; }
+  done
+done
+unset plugin dir
 
 [[ -f "$HOME/.local/share/zsh-history-substring-search/zsh-history-substring-search.zsh" ]] &&
   source "$HOME/.local/share/zsh-history-substring-search/zsh-history-substring-search.zsh"

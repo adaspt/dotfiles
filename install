@@ -12,18 +12,30 @@ DOTFILES_DIR="$(dirname "$(readlink -f "$0")")"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles"
 source "$DOTFILES_DIR/lib/common.sh"
 
-# In run order. onedrive and ssh come first, so the sign-in and the age passphrase are asked right after
-# the form, and everything after them runs unattended
-ALL_STEPS=(onedrive ssh base hardware gdm gnome dev gaming)
-DEFAULT_STEPS=(onedrive ssh base hardware gdm gnome)
+# In run order. onedrive, ssh and vpn come first, so the sign-in and the age passphrase are asked right
+# after the form, and everything after them runs unattended
+ALL_STEPS=(onedrive ssh vpn base hardware gnome agents dev gaming)
+DEFAULT_STEPS=(onedrive ssh vpn base hardware gnome agents)
 
 # The form's answer: STEPS
 ANSWERS_FILE="$STATE_DIR/answers"
 STEPS="${DEFAULT_STEPS[*]}"
 [ ! -f "$ANSWERS_FILE" ] || source "$ANSWERS_FILE"
 
-# What the steps' needs_restart calls collected. In the runtime dir, a tmpfs, so a restart clears it
-RESTART_FILE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/dotfiles-restart"
+# In the runtime dir, a tmpfs private to the user: nothing is written to disk, and a restart clears it.
+# RESTART_FILE: what the steps' needs_restart calls collected.
+# SECRETS_DIR: the secrets archive, decrypted once by the first step that needs it (unlock_secrets)
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+RESTART_FILE="$RUNTIME_DIR/dotfiles-restart"
+SECRETS_DIR="$RUNTIME_DIR/dotfiles-secrets"
+
+# On exit, also after a failed step or Ctrl-C: stop the sudo refresher, delete the decrypted secrets
+SUDO_LOOP_PID=""
+cleanup() {
+  [ -z "$SUDO_LOOP_PID" ] || kill "$SUDO_LOOP_PID" 2>/dev/null || true
+  rm -rf "$SECRETS_DIR" "$SECRETS_DIR.part"
+}
+trap cleanup EXIT
 
 # Runs one step in its own bash process, so its variables and `exit` stay contained,
 # and `set -e` works inside it no matter how this function is called.
@@ -33,7 +45,8 @@ run_step() {
   echo
   echo "==> $step"
   mkdir -p "$STATE_DIR"
-  if ! DOTFILES_DIR="$DOTFILES_DIR" STATE_DIR="$STATE_DIR" RESTART_FILE="$RESTART_FILE" bash -c '
+  if ! DOTFILES_DIR="$DOTFILES_DIR" STATE_DIR="$STATE_DIR" RESTART_FILE="$RESTART_FILE" \
+    SECRETS_DIR="$SECRETS_DIR" bash -c '
     set -euo pipefail
     source "$DOTFILES_DIR/lib/common.sh"
     source "$DOTFILES_DIR/steps/$1.sh"
@@ -58,8 +71,8 @@ keep_sudo_alive() {
   while sleep 60; do
     kill -0 "$$" 2>/dev/null || exit 0 # ./install is gone, even if killed without running the trap
     sudo -n -v || exit 0
-  done &
-  trap "kill $! 2>/dev/null" EXIT
+  done < /dev/null > /dev/null 2>&1 & # holds no output open, so nothing waits for its last sleep
+  SUDO_LOOP_PID=$!
 }
 
 # in_list WORD "LIST" - true when WORD is one of the space-separated words in LIST

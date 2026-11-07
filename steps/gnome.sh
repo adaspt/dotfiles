@@ -1,6 +1,9 @@
-# GNOME extensions and settings. Settings live in config/gnome.ini.
+# GNOME extensions and settings, for the desktop session and the login screen (GDM greeter).
+# Settings live in config/gnome.ini.
 
-install_packages gnome
+# Extensions from Fedora's repos, enabled by config/gnome.ini below
+sudo dnf install -y gnome-browser-connector gnome-shell-extension-dash-to-dock \
+  gnome-shell-extension-caffeine gnome-shell-extension-appindicator
 flatpak install -y --noninteractive --system flathub be.alexandervanhee.gradia
 
 # ---------- Personal extensions ----------
@@ -27,8 +30,25 @@ done
 # ---------- Settings ----------
 echo "Applying GNOME settings from config/gnome.ini"
 dconf load / < "$DOTFILES_DIR/config/gnome.ini"
-# Suspend settings, the same file the gdm step installs for the login screen
-dconf load / < "$DOTFILES_DIR/files/etc/dconf/db/gdm.d/00-power-$(power_type)"
+
+# ---------- Suspend ----------
+# When idle: a laptop after 15 minutes on battery and 1 hour plugged in, a desktop never.
+# One file for both: installed for the login screen (Fedora's gdm package already ships the dconf
+# profile with system-db:gdm), and loaded into this session
+POWER_FILE="etc/dconf/db/gdm.d/00-power-$(power_type)"
+put "$POWER_FILE" -- sudo dconf update
+dconf load / < "$DOTFILES_DIR/config/system/$POWER_FILE"
+
+# ---------- Login screen monitors ----------
+# A path unit copies ~/.config/monitors.xml to GDM every time Settings > Displays saves it,
+# so arranging the monitors after the final restart (with the final GPU driver) is enough
+enable_monitor_sync() {
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now "gdm-monitors@$USER.path"
+  # Copy the current layout right away; skipped quietly while there is none
+  sudo systemctl start "gdm-monitors@$USER.service"
+}
+put etc/systemd/system/gdm-monitors@.path etc/systemd/system/gdm-monitors@.service -- enable_monitor_sync
 
 # ---------- Wallpaper ----------
 # From OneDrive (synced by the onedrive step), copied to where Settings keeps wallpapers,

@@ -11,20 +11,32 @@ needs_restart() {
   echo "$*" >> "$RESTART_FILE"
 }
 
-# install_packages NAME - dnf install everything listed in packages/NAME.txt
-install_packages() {
-  local pkgs
-  mapfile -t pkgs < <(sed 's/#.*//' "$DOTFILES_DIR/packages/$1.txt" | xargs -n1)
-  sudo dnf install -y "${pkgs[@]}"
+# unlock_secrets - decrypt Backup/secrets.tar.gz.age from OneDrive into SECRETS_DIR, unless an earlier step
+# of this ./install run already did. Asks for the age passphrase. Contents: ssh/ (for ~/.ssh), agersi-vpn.conf
+unlock_secrets() {
+  local archive="$HOME/OneDrive/Backup/secrets.tar.gz.age"
+  [ ! -d "$SECRETS_DIR" ] || return 0
+  [ -f "$archive" ] || die "$archive not found. Is OneDrive synced? See: journalctl --user -u onedrive"
+  command -v age > /dev/null || sudo dnf install -y age
+  # Into .part first, so a wrong passphrase doesn't leave a half-filled SECRETS_DIR behind
+  rm -rf "$SECRETS_DIR.part"
+  mkdir -m 700 "$SECRETS_DIR.part"
+  age --decrypt "$archive" | tar -xz -C "$SECRETS_DIR.part"
+  mv "$SECRETS_DIR.part" "$SECRETS_DIR"
 }
 
-# link SRC DEST - symlink a file from the repo (SRC is relative to it) into place
-link() {
-  mkdir -p "$(dirname "$2")"
-  ln -sfn "$DOTFILES_DIR/$1" "$2"
+# link_home - symlink every file in config/home to the same path under ~, e.g.
+# config/home/.claude/CLAUDE.md -> ~/.claude/CLAUDE.md. Files, not folders, so ~/.claude keeps its own content
+link_home() {
+  local src="$DOTFILES_DIR/config/home" file rel
+  while IFS= read -r -d '' file; do
+    rel="${file#"$src/"}"
+    mkdir -p "$(dirname "$HOME/$rel")"
+    ln -sfn "$file" "$HOME/$rel"
+  done < <(find "$src" -type f -print0)
 }
 
-# put PATH... [-- COMMAND...] - copy files/PATH to /PATH as root, then run COMMAND if any file changed:
+# put PATH... [-- COMMAND...] - copy config/system/PATH to /PATH as root, then run COMMAND if any file changed:
 #   put etc/sysctl.d/foo.conf -- sudo sysctl --system
 # COMMAND can be a function defined in the step. If it fails, the step fails, and the next run
 # retries it even though the files are now up to date (a pending marker remembers it).
@@ -39,9 +51,9 @@ put() {
   [ $# -gt 0 ] && shift # the --
 
   for file in "${files[@]}"; do
-    cmp -s "$DOTFILES_DIR/files/$file" "/$file" && continue
+    cmp -s "$DOTFILES_DIR/config/system/$file" "/$file" && continue
     echo "Installing /$file"
-    sudo install -Dm644 "$DOTFILES_DIR/files/$file" "/$file" || die "Failed to install /$file"
+    sudo install -Dm644 "$DOTFILES_DIR/config/system/$file" "/$file" || die "Failed to install /$file"
     changed=1
   done
 
@@ -80,7 +92,7 @@ is_p14s_gen4() {
 }
 
 # power_type - "laptop" when the PC has a battery, else "desktop". Picks the suspend settings,
-# files/etc/dconf/db/gdm.d/00-power-TYPE
+# config/system/etc/dconf/db/gdm.d/00-power-TYPE
 power_type() {
   if compgen -G "/sys/class/power_supply/BAT*" > /dev/null; then echo laptop; else echo desktop; fi
 }

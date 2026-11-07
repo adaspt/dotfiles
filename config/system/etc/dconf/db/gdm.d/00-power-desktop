@@ -1,5 +1,5 @@
 # Desktop (no battery): never suspend when idle.
-# Installed for the login screen by the gdm step, loaded into the desktop session by the gnome step
+# Installed for the login screen and loaded into the desktop session, both by the gnome step
 [org/gnome/settings-daemon/plugins/power]
 sleep-inactive-ac-type='nothing'
 sleep-inactive-ac-timeout=0

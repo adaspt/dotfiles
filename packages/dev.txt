@@ -1,3 +1,0 @@
-# Installed by steps/dev.sh, after it adds Microsoft's repo
-azure-cli
-dotnet-sdk-10.0
