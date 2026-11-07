@@ -2,8 +2,3 @@
 azure-cli
 dotnet-sdk-10.0
 claude-desktop-unofficial
-
-# The Claude Desktop rpm doesn't pull in the QEMU stack Cowork runs on
-qemu-system-x86-core
-edk2-ovmf
-virtiofsd

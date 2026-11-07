@@ -14,9 +14,6 @@ rpm -q packages-microsoft-prod &> /dev/null || {
 install_packages dev
 
 # ---------- Claude Desktop ----------
-# Cowork needs /dev/kvm and /dev/vhost-vsock
-id -nG "$USER" | grep -qw kvm || sudo usermod -aG kvm "$USER"
-
 # Native Wayland instead of XWayland: its X11 window left open at logout makes GNOME Shell hang on shutdown
 link config/environment.d/claude.conf "$HOME/.config/environment.d/claude.conf"
 
@@ -33,4 +30,4 @@ rpm -q chatgpt &> /dev/null ||
 # ---------- nvm (PROFILE=/dev/null: .zshrc already loads it) ----------
 [ -d "$HOME/.nvm" ] || curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | PROFILE=/dev/null bash
 
-needs_restart "log out and back in for the kvm group and CLAUDE_USE_WAYLAND"
+needs_restart "log out and back in for CLAUDE_USE_WAYLAND"
