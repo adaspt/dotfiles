@@ -1,8 +1,11 @@
 # SSH keys and the WireGuard VPN, from age-encrypted archives in OneDrive's Backup folder.
-# Runs after the onedrive step, which syncs that folder. The archives stay there:
-# deleting them would delete them from OneDrive too.
+# Runs after the onedrive step, which syncs that folder, and before base, so the passphrase is asked
+# early. The archives stay there: deleting them would delete them from OneDrive too.
 
 BACKUP_DIR="$HOME/OneDrive/Backup"
+
+# Runs before base, which installs the rest of the packages
+command -v age > /dev/null || sudo dnf install -y age
 
 for f in ssh.tar.gz.age agersi-vpn.conf.age; do
   [ -f "$BACKUP_DIR/$f" ] || die "$BACKUP_DIR/$f not found. Is OneDrive synced? See: journalctl --user -u onedrive"

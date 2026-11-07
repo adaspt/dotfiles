@@ -1,13 +1,12 @@
-# Steam and GeForce NOW (optional: ./install gaming).
+# Steam and GeForce NOW.
 
-if ask "Install Steam?"; then
-  # RPM Fusion's Steam repo comes with fedora-workstation-repositories, disabled unless third-party repos were enabled at install
-  sudo dnf config-manager setopt rpmfusion-nonfree-steam.enabled=1
-  sudo dnf install -y steam
-fi
+# RPM Fusion's Steam repo comes with fedora-workstation-repositories, disabled unless third-party repos were enabled at install
+sudo dnf config-manager setopt rpmfusion-nonfree-steam.enabled=1
+sudo dnf install -y steam
 
-if ask "Install GeForce NOW?"; then
-  # The installer writes GeForceNOWSetup.log to its working directory, so run it in a temp dir
+# GeForce NOW: NVIDIA's installer sets it up as a user flatpak, and it updates through flatpak after that.
+# The installer writes GeForceNOWSetup.log to its working directory, so run it in a temp dir
+if ! flatpak info --user com.nvidia.geforcenow &> /dev/null; then
   GFN_DIR="$(mktemp -d -t geforcenow.XXXXXX)"
   curl -fSL -o "$GFN_DIR/GeForceNOWSetup.bin" https://international.download.nvidia.com/GFNLinux/GeForceNOWSetup.bin
   chmod +x "$GFN_DIR/GeForceNOWSetup.bin"

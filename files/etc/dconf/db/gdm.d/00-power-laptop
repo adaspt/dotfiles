@@ -1,0 +1,7 @@
+# Laptop (has a battery): suspend when idle, after 15 minutes on battery and 1 hour plugged in.
+# Installed for the login screen by the gdm step, loaded into the desktop session by the gnome step
+[org/gnome/settings-daemon/plugins/power]
+sleep-inactive-battery-type='suspend'
+sleep-inactive-battery-timeout=900
+sleep-inactive-ac-type='suspend'
+sleep-inactive-ac-timeout=3600

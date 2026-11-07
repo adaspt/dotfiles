@@ -1,8 +1,8 @@
-# GPU drivers and power tweaks, chosen from the detected hardware:
-#   laptop with NVIDIA  -> NVIDIA GPU switched off (Intel only, better battery)
-#   laptop              -> USB controllers (XHCI) can't wake it from suspend
-#   laptop with Intel   -> xe driver instead of i915
-#   desktop with NVIDIA -> proprietary NVIDIA driver
+# GPU drivers and power tweaks:
+#   ThinkPad P14s Gen 4 -> NVIDIA RTX A500 switched off, because it is defective;
+#                          USB controllers (XHCI) can't wake it from suspend, because they kept waking it;
+#                          xe driver instead of i915, which caused problems (newer Intel GPUs use xe already)
+#   any other NVIDIA    -> proprietary NVIDIA driver
 #
 # The base step's upgrade can install a newer kernel without a restart before this step, so kernel
 # modules and arguments are handled for the kernel the next boot starts, not the running one.
@@ -77,20 +77,12 @@ nvidia_driver() {
   needs_restart "NVIDIA driver installed"
 }
 
-if is_laptop; then
-  echo "Detected: laptop"
-  if has_gpu 0x10de && confirm "Switch off the NVIDIA GPU?"; then
-    disable_nvidia
-  fi
-  if confirm "Stop USB controllers from waking the laptop from suspend?"; then
-    disable_usb_wakeup
-  fi
-  if has_gpu 0x8086 && confirm "Use the xe driver for the Intel GPU?"; then
-    intel_xe_driver
-  fi
-else
-  echo "Detected: $(hostnamectl chassis 2>/dev/null || echo desktop)"
-  if has_gpu 0x10de && confirm "Install the proprietary NVIDIA driver?"; then
-    nvidia_driver
-  fi
+echo "Detected: $(hostnamectl chassis 2>/dev/null || echo desktop)"
+
+if is_p14s_gen4; then
+  disable_nvidia
+  disable_usb_wakeup
+  intel_xe_driver
+elif has_gpu 0x10de; then
+  nvidia_driver
 fi

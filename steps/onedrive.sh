@@ -25,7 +25,7 @@ if ! systemctl --user is-enabled --quiet onedrive; then
   onedrive --sync --single-directory Backup --resync --resync-auth --verbose
 
   # The service syncs the rest in the background.
-  # Linger (enabled in the base step) keeps it syncing when not logged in
+  # Linger (enabled later by the base step) keeps it syncing when not logged in
   systemctl --user enable --now onedrive
 fi
 

@@ -1,4 +1,4 @@
-# Development tools (optional: ./install dev).
+# Development tools.
 
 # ---------- Repos ----------
 # Azure CLI: Microsoft's RHEL 10 repo, Fedora's package lags behind

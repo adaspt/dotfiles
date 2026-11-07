@@ -26,6 +26,8 @@ done
 # ---------- Settings ----------
 echo "Applying GNOME settings from config/gnome.ini"
 dconf load / < "$DOTFILES_DIR/config/gnome.ini"
+# Suspend settings, the same file the gdm step installs for the login screen
+dconf load / < "$DOTFILES_DIR/files/etc/dconf/db/gdm.d/00-power-$(power_type)"
 
 # ---------- Wallpaper ----------
 # From OneDrive (synced by the onedrive step), copied to where Settings keeps wallpapers,

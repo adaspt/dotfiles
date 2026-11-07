@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
 # Sets up this PC. Safe to run again: every step checks what is already done.
 #
-#   ./install            run the default steps that aren't done yet, in order,
-#                        then list what needs a restart (one restart at the end)
-#   ./install STEP...    run these steps, done or not (also the optional ones)
-#   ./install status     show which steps are done
+#   ./install            first run: a form to pick the steps; then runs the selected steps that
+#                        aren't done yet, in order, and lists what needs a restart
+#   ./install configure  show the form again, then continue like ./install
+#   ./install STEP...    run these steps, done or not
+#   ./install status     show which steps are selected and done
 set -euo pipefail
 
 DOTFILES_DIR="$(dirname "$(readlink -f "$0")")"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles"
 source "$DOTFILES_DIR/lib/common.sh"
 
-DEFAULT_STEPS=(hostname base hardware gdm onedrive ssh gnome)
-OPTIONAL_STEPS=(dev gaming)
+# In run order. onedrive and ssh come first, so the sign-in and the age passphrase are asked right after
+# the form, and everything after them runs unattended
+ALL_STEPS=(onedrive ssh base hardware gdm gnome dev gaming)
+DEFAULT_STEPS=(onedrive ssh base hardware gdm gnome)
+
+# The form's answer: STEPS
+ANSWERS_FILE="$STATE_DIR/answers"
+STEPS="${DEFAULT_STEPS[*]}"
+[ ! -f "$ANSWERS_FILE" ] || source "$ANSWERS_FILE"
 
 # What the steps' needs_restart calls collected. In the runtime dir, a tmpfs, so a restart clears it
 RESTART_FILE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/dotfiles-restart"
@@ -21,7 +29,6 @@ RESTART_FILE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/dotfiles-restart"
 # and `set -e` works inside it no matter how this function is called.
 run_step() {
   local step="$1"
-  [ -f "$DOTFILES_DIR/steps/$step.sh" ] || die "Unknown step: $step (see ./install status)"
 
   echo
   echo "==> $step"
@@ -55,17 +62,45 @@ keep_sudo_alive() {
   trap "kill $! 2>/dev/null" EXIT
 }
 
+# in_list WORD "LIST" - true when WORD is one of the space-separated words in LIST
+in_list() {
+  [[ " $2 " == *" $1 "* ]]
+}
+
+# The form: steps to run, with the saved or default ones pre-ticked. Saved to ANSWERS_FILE
+configure() {
+  local step selected=()
+  command -v gum > /dev/null || sudo dnf install -y gum
+
+  for step in "${ALL_STEPS[@]}"; do
+    if in_list "$step" "$STEPS"; then selected+=("$step"); fi
+  done
+  STEPS="$(gum choose --no-limit --header "Steps to run" \
+    --selected "$(IFS=,; echo "${selected[*]}")" "${ALL_STEPS[@]}" | tr '\n' ' ')"
+
+  mkdir -p "$STATE_DIR"
+  printf 'STEPS=%q\n' "$STEPS" > "$ANSWERS_FILE"
+
+  echo "Steps: $STEPS"
+
+  # Found now rather than in the middle of the unattended part
+  if in_list hardware "$STEPS" && nvidia_needs_driver && mokutil --sb-state 2>/dev/null | grep -q "SecureBoot enabled"; then
+    die "Secure Boot is enabled, so the NVIDIA driver wouldn't load. Turn it off in the firmware settings and run ./install again."
+  fi
+}
+
 status() {
   local step mark
-  for step in "${DEFAULT_STEPS[@]}" "${OPTIONAL_STEPS[@]}"; do
+  for step in "${ALL_STEPS[@]}"; do
     mark="[ ]"
     [ -f "$STATE_DIR/$step.done" ] && mark="[x]"
-    if [[ " ${OPTIONAL_STEPS[*]} " == *" $step "* ]]; then
-      echo "$mark $step (optional)"
-    else
+    if in_list "$step" "$STEPS"; then
       echo "$mark $step"
+    else
+      echo "$mark $step (not selected)"
     fi
   done
+  [ -f "$ANSWERS_FILE" ] || echo "Not configured yet: ./install shows the form first."
 }
 
 if [ "${1:-}" = "status" ]; then
@@ -73,22 +108,30 @@ if [ "${1:-}" = "status" ]; then
   exit 0
 fi
 
+for step in "$@"; do
+  [ "$step" = configure ] || [ -f "$DOTFILES_DIR/steps/$step.sh" ] || die "Unknown step: $step (see ./install status)"
+done
+
 keep_sudo_alive
 
-if [ $# -gt 0 ]; then
+if [ "${1:-}" = "configure" ]; then
+  configure
+elif [ $# -gt 0 ]; then
   for step in "$@"; do
     run_step "$step"
   done
   restart_notice
   exit 0
+elif [ ! -f "$ANSWERS_FILE" ]; then
+  configure
 fi
 
-for step in "${DEFAULT_STEPS[@]}"; do
+for step in "${ALL_STEPS[@]}"; do
+  in_list "$step" "$STEPS" || continue
   [ -f "$STATE_DIR/$step.done" ] && continue
   run_step "$step"
 done
 
 echo
-echo "All default steps are done."
-echo "Optional: ./install dev | gaming"
+echo "All selected steps are done. Change the selection with ./install configure."
 restart_notice

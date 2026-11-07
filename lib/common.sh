@@ -6,20 +6,6 @@ die() {
   exit 1
 }
 
-# ask "Question?" - yes only when the answer is y/Y
-ask() {
-  local reply
-  read -rp "$1 (y/N) " reply
-  [[ "$reply" == [yY] ]]
-}
-
-# confirm "Question?" - yes unless the answer is n/N
-confirm() {
-  local reply
-  read -rp "$1 (Y/n) " reply
-  [[ "$reply" != [nN] ]]
-}
-
 # needs_restart "reason" - ./install lists the reason at the end and asks for one restart
 needs_restart() {
   echo "$*" >> "$RESTART_FILE"
@@ -90,9 +76,20 @@ gpu_device_id() {
   return 1
 }
 
-is_laptop() {
-  case "$(hostnamectl chassis 2>/dev/null)" in
-    laptop | convertible | tablet) return 0 ;;
-    *) return 1 ;;
-  esac
+# is_p14s_gen4 - true on the ThinkPad P14s Gen 4 (Intel, machine type 21HF). Its NVIDIA RTX A500 is
+# defective, its USB controllers kept waking it from suspend, and i915 caused problems
+is_p14s_gen4() {
+  [[ "$(cat /sys/class/dmi/id/product_name 2>/dev/null)" == 21HF* ]]
+}
+
+# power_type - "laptop" when the PC has a battery, else "desktop". Picks the suspend settings,
+# files/etc/dconf/db/gdm.d/00-power-TYPE
+power_type() {
+  if compgen -G "/sys/class/power_supply/BAT*" > /dev/null; then echo laptop; else echo desktop; fi
+}
+
+# nvidia_needs_driver - true when an NVIDIA GPU is present that should get the proprietary driver:
+# any, except on the P14s Gen 4, where it is switched off
+nvidia_needs_driver() {
+  has_gpu 0x10de && ! is_p14s_gen4
 }

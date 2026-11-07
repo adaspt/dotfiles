@@ -8,31 +8,35 @@ curl -fsSL https://raw.githubusercontent.com/adaspt/dotfiles/fedora/bootstrap.sh
 
 This installs git, clones the repo to `~/Projects/personal/dotfiles` and starts `./install`.
 
-`./install` runs the steps below in order and skips the ones already done. Steps don't stop for
-restarts: at the end it lists what needs one, and a single restart covers all of it.
+`./install` starts with a form: which steps to run. The answer is saved, so later runs skip the form. Then it runs the selected
+steps in order and skips the ones already done.
+
+Only the start needs you: the form, the OneDrive sign-in and the age passphrase. The rest runs
+unattended, and steps don't stop for restarts: at the end it lists what needs one, and a single restart
+covers all of it.
 
 | Step       | What it does                                                                                        |
 | ---------- | --------------------------------------------------------------------------------------------------- |
-| `hostname` | Asks for the PC name                                                                                |
-| `base`     | Upgrade, repos, packages, fonts, dotfiles, zsh, sysctl, boot log                                    |
-| `hardware` | Detects the hardware. Laptop: NVIDIA off, no USB wakeup, Intel xe driver. Desktop: NVIDIA driver    |
-| `gdm`      | Login screen: keeps its monitor layout in sync with yours, disables suspend                         |
 | `onedrive` | OneDrive client: sign in once in the browser, then syncs the folders in `config/onedrive/sync_list` |
 | `ssh`      | Decrypts the SSH keys and VPN profile from `~/OneDrive/Backup` (asks for the age passphrase)        |
-| `gnome`    | Extensions, settings from `config/gnome.ini`, wallpaper from `~/OneDrive/Backup`                    |
+| `base`     | Upgrade, repos, packages, fonts, dotfiles, zsh, sysctl, boot log                                    |
+| `hardware` | P14s Gen 4: NVIDIA off, no USB wakeup, xe driver. Other NVIDIA GPUs: driver                       |
+| `gdm`      | Login screen: keeps its monitor layout in sync with yours, suspend settings as below                |
+| `gnome`    | Extensions, settings from `config/gnome.ini`, suspend settings, wallpaper from `~/OneDrive/Backup` |
+| `dev`      | Not selected by default. Development tools, Claude Code, Codex, T3 Code                             |
+| `gaming`   | Not selected by default. Steam, GeForce NOW                                                         |
 
-Optional steps: `./install dev`, `./install gaming`.
-
+- `./install configure` shows the form again, then continues with newly ticked steps
 - `./install STEP...` runs steps again, done or not
-- `./install status` shows which steps are done
+- `./install status` shows which steps are selected and done
 
 # Layout
 
 | Path        | Contents                                                                                    |
 | ----------- | ------------------------------------------------------------------------------------------- |
-| `install`   | Entry point; tracks finished steps in `~/.local/state/dotfiles/`                             |
+| `install`   | Entry point; keeps the selected and finished steps in `~/.local/state/dotfiles/`             |
 | `steps/`    | One script per step; each is safe to run again                                              |
-| `lib/`      | Helpers: `ask`, `confirm`, `needs_restart`, `install_packages`, `link`, `put`, `has_gpu`     |
+| `lib/`      | Helpers: `needs_restart`, `install_packages`, `link`, `put`, `has_gpu`, `power_type`         |
 | `packages/` | dnf package lists, one per line                                                             |
 | `config/`   | Dotfiles, symlinked into `~` by the base step; `gnome.ini` is loaded with `dconf load /`     |
 | `files/`    | System files, mirroring `/`, copied into place by `put` (e.g. `files/etc/sysctl.d/...`)      |
