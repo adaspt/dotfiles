@@ -14,7 +14,8 @@ for NAME in launcher window-keys mail-monitor; do
     mkdir -p "$(dirname "$DIR")"
     git clone "https://github.com/adaspt/gnome-shell-extension-$NAME.git" "$DIR"
   else
-    git -C "$DIR" pull --ff-only
+    # Local commits or changes make this fail; keep the clone as it is then
+    git -C "$DIR" pull --ff-only || echo "Couldn't update $DIR, keeping it as it is."
   fi
   # Compiled schemas are gitignored, so build them after clone/pull
   if [ -d "$DIR/schemas" ]; then
@@ -49,9 +50,5 @@ for battery in $(upower -e | grep battery_); do
   gdbus call --system --dest org.freedesktop.UPower --object-path "$battery" \
     --method org.freedesktop.UPower.Device.EnableChargeThreshold true >/dev/null
 done
-
-# Wi-Fi and Bluetooth off - last, so the downloads above can still use Wi-Fi
-nmcli radio wifi off
-rfkill block bluetooth
 
 needs_restart "GNOME Shell loads the new extensions"

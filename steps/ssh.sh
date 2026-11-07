@@ -7,15 +7,17 @@ BACKUP_DIR="$HOME/OneDrive/Backup"
 # Runs before base, which installs the rest of the packages
 command -v age > /dev/null || sudo dnf install -y age
 
-for f in ssh.tar.gz.age agersi-vpn.conf.age; do
-  [ -f "$BACKUP_DIR/$f" ] || die "$BACKUP_DIR/$f not found. Is OneDrive synced? See: journalctl --user -u onedrive"
-done
+# require_backup FILE - stop with a hint when OneDrive hasn't synced FILE into the Backup folder
+require_backup() {
+  [ -f "$BACKUP_DIR/$1" ] || die "$BACKUP_DIR/$1 not found. Is OneDrive synced? See: journalctl --user -u onedrive"
+}
 
 mkdir -p "$HOME/.ssh"
 chmod 700 "$HOME/.ssh"
 
 # Skipped once the keys are there, so running the step again doesn't ask for the passphrase
 if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
+  require_backup ssh.tar.gz.age
   echo "Setting up SSH keys"
   age --decrypt "$BACKUP_DIR/ssh.tar.gz.age" | tar -xz -C "$HOME/.ssh"
 fi
@@ -28,13 +30,14 @@ find "$HOME/.ssh" -maxdepth 1 -type f -name "*.pub" -exec chmod 644 {} +
 
 # ---------- VPN ----------
 if ! nmcli connection show agersi-vpn &> /dev/null; then
+  require_backup agersi-vpn.conf.age
   echo "Setting up VPN connection"
   # Decrypted into a private temp dir, never next to the archive, or OneDrive would upload it.
-  # nmcli names the connection after the file, so the name matters
+  # Removed when the step ends, also when it fails. nmcli names the connection after the file
   VPN_DIR="$(mktemp -d)"
+  trap 'rm -rf "$VPN_DIR"' EXIT
   age --decrypt "$BACKUP_DIR/agersi-vpn.conf.age" > "$VPN_DIR/agersi-vpn.conf"
   nmcli connection import type wireguard file "$VPN_DIR/agersi-vpn.conf"
-  rm -rf "$VPN_DIR"
   nmcli connection modify agersi-vpn connection.autoconnect no
   nmcli connection down agersi-vpn || true
 fi

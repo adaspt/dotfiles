@@ -54,16 +54,8 @@ put() {
   rm -f "$pending"
 }
 
-# has_gpu VENDOR_ID - true when a display controller from that PCI vendor is present (0x8086 Intel, 0x10de NVIDIA)
-has_gpu() {
-  local dev
-  for dev in /sys/bus/pci/devices/*; do
-    [ "$(<"$dev/vendor")" = "$1" ] && [[ "$(<"$dev/class")" == 0x03* ]] && return 0
-  done
-  return 1
-}
-
-# gpu_device_id VENDOR_ID - PCI device ID of that vendor's display controller, e.g. a7a0
+# gpu_device_id VENDOR_ID - PCI device ID of that vendor's display controller, e.g. a7a0;
+# fails when there is none (0x8086 Intel, 0x10de NVIDIA)
 gpu_device_id() {
   local dev id
   for dev in /sys/bus/pci/devices/*; do
@@ -74,6 +66,11 @@ gpu_device_id() {
     fi
   done
   return 1
+}
+
+# has_gpu VENDOR_ID - true when a display controller from that PCI vendor is present
+has_gpu() {
+  gpu_device_id "$1" > /dev/null
 }
 
 # is_p14s_gen4 - true on the ThinkPad P14s Gen 4 (Intel, machine type 21HF). Its NVIDIA RTX A500 is

@@ -77,8 +77,6 @@ nvidia_driver() {
   needs_restart "NVIDIA driver installed"
 }
 
-echo "Detected: $(hostnamectl chassis 2>/dev/null || echo desktop)"
-
 if is_p14s_gen4; then
   disable_nvidia
   disable_usb_wakeup
