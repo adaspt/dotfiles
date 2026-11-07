@@ -8,24 +8,23 @@ curl -fsSL https://raw.githubusercontent.com/adaspt/dotfiles/fedora/bootstrap.sh
 
 This installs git, clones the repo to `~/Projects/personal/dotfiles` and starts `./install`.
 
-`./install` runs the steps below in order and skips the ones already done. When a step needs a
-restart it stops; restart and run `~/Projects/personal/dotfiles/install` again to continue.
+`./install` runs the steps below in order and skips the ones already done. Steps don't stop for
+restarts: at the end it lists what needs one, and a single restart covers all of it.
 
 | Step       | What it does                                                                                        |
 | ---------- | --------------------------------------------------------------------------------------------------- |
 | `hostname` | Asks for the PC name                                                                                |
-| `base`     | Upgrade, repos, packages, fonts, dotfiles, zsh, sysctl, boot log. Restart                           |
+| `base`     | Upgrade, repos, packages, fonts, dotfiles, zsh, sysctl, boot log                                    |
 | `hardware` | Detects the hardware. Laptop: NVIDIA off, no USB wakeup, Intel xe driver. Desktop: NVIDIA driver    |
-| `gdm`      | Login screen: copies the monitor layout (configure monitors first), disables suspend                |
-| `ssh`      | Asks you to download the SSH keys and VPN profile in Chrome, then decrypts and installs them        |
-| `gnome`    | Extensions and settings from `config/gnome.ini`. Log out and back in                                |
+| `gdm`      | Login screen: keeps its monitor layout in sync with yours, disables suspend                         |
+| `onedrive` | OneDrive client: sign in once in the browser, then syncs the folders in `config/onedrive/sync_list` |
+| `ssh`      | Decrypts the SSH keys and VPN profile from `~/OneDrive/Backup` (asks for the age passphrase)        |
+| `gnome`    | Extensions, settings from `config/gnome.ini`, wallpaper from `~/OneDrive/Backup`                    |
 
-Optional steps: `./install dev`, `./install onedrive`, `./install gaming`.
+Optional steps: `./install dev`, `./install gaming`.
 
 - `./install STEP...` runs steps again, done or not
 - `./install status` shows which steps are done
-
-Still manual: set the wallpaper.
 
 # Layout
 
@@ -50,5 +49,7 @@ Create empty folder, copy files from ~/.ssh, remove/update whats needed, run com
 tar -czvf ssh.tar.gz *
 age --passphrase --armor -o ssh.tar.gz.age ssh.tar.gz
 ```
+
+Then upload `ssh.tar.gz.age` to the `Backup` folder in OneDrive.
 
 dconf dump /

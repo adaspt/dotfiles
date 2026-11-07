@@ -11,8 +11,8 @@ main() {
 
   if [ ! -d "$dotfiles_dir/.git" ]; then
     mkdir -p "$(dirname "$dotfiles_dir")"
+    # Stays an HTTPS remote: pulls need no key, and .gitconfig sends pushes over SSH
     git clone -b fedora https://github.com/adaspt/dotfiles.git "$dotfiles_dir"
-    git -C "$dotfiles_dir" remote set-url origin git@github.com:adaspt/dotfiles.git
   fi
 
   # Piped into bash, stdin is the script itself; the install prompts need the terminal

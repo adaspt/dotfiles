@@ -1,4 +1,4 @@
-# OneDrive client syncing the folders in config/onedrive/sync_list (optional: ./install onedrive).
+# OneDrive client syncing the folders in config/onedrive/sync_list. The ssh step after it reads Backup/.
 
 CONFIG_DIR="$HOME/.config/onedrive"
 
@@ -20,9 +20,11 @@ if ! systemctl --user is-enabled --quiet onedrive; then
     [ -f "$CONFIG_DIR/refresh_token" ] || die "OneDrive authentication failed"
   fi
 
+  # Only Backup/ now: the ssh step needs it, and the full first sync can take long.
   # The client demands --resync on the first sync with a sync_list (no saved state yet)
-  onedrive --sync --resync --resync-auth --verbose
+  onedrive --sync --single-directory Backup --resync --resync-auth --verbose
 
+  # The service syncs the rest in the background.
   # Linger (enabled in the base step) keeps it syncing when not logged in
   systemctl --user enable --now onedrive
 fi

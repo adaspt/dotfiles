@@ -64,14 +64,11 @@ export EDITOR='nano'
 
 # ---------- Aliases ----------
 alias cls='clear'
-alias ls='eza -a --color=always --group-directories-first --icons=always'
-alias la='eza -al --color=always --group-directories-first --icons=always'
-alias lt='eza -aT --color=always --group-directories-first --icons=always'
+alias ls='eza -a --color=auto --group-directories-first --icons=auto'
+alias la='eza -al --color=auto --group-directories-first --icons=auto'
+alias lt='eza -aT --color=auto --group-directories-first --icons=auto'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
-alias cp='cp -i'
-alias mv='mv -i'
-alias rm='rm -i'
 alias ta='tmux new -A -s'
 
 compdef eza=ls
@@ -144,7 +141,11 @@ bindkey '^[[Z' undo                             # Shift+Tab for undo
 
 
 # ---------- zoxide (last integration, so nothing replaces its cd hook) ----------
-command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
+# Only in a terminal: for an agent, cd to a missing directory must fail, not jump to a similar one
+# from history. Claude Code sets CLAUDECODE; other agents' shells have no terminal.
+if [[ -t 1 && -z "$CLAUDECODE" ]] && command -v zoxide >/dev/null; then
+  eval "$(zoxide init --cmd cd zsh)"
+fi
 
 
 # ---------- Local overrides (machine-specific, not in repo) ----------

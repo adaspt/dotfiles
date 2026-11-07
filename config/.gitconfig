@@ -37,6 +37,9 @@
 	conflictstyle = zdiff3
 [log]
 	follow = true
+[url "git@github.com:"]
+	# Clone and pull over HTTPS (no key needed for public repos), push over SSH
+	pushInsteadOf = https://github.com/
 [alias]
 	incoming = "!f() { git log --oneline --abbrev-commit \"HEAD..${1:-FETCH_HEAD}\"; }; f"
 	outgoing = log @{u}..HEAD --oneline

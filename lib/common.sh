@@ -20,9 +20,9 @@ confirm() {
   [[ "$reply" != [nN] ]]
 }
 
-# needs_restart "reason" - ./install stops after the current step and asks for a restart
+# needs_restart "reason" - ./install lists the reason at the end and asks for one restart
 needs_restart() {
-  echo "$*" >> "$RESTART_FLAG"
+  echo "$*" >> "$RESTART_FILE"
 }
 
 # install_packages NAME - dnf install everything listed in packages/NAME.txt

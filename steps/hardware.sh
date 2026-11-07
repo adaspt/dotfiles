@@ -3,7 +3,16 @@
 #   laptop              -> USB controllers (XHCI) can't wake it from suspend
 #   laptop with Intel   -> xe driver instead of i915
 #   desktop with NVIDIA -> proprietary NVIDIA driver
-# Runs after the base step's restart, so the running kernel is the latest one.
+#
+# The base step's upgrade can install a newer kernel without a restart before this step, so kernel
+# modules and arguments are handled for the kernel the next boot starts, not the running one.
+
+# Version of the default boot kernel, e.g. 7.2.15-300.fc45.x86_64
+boot_kernel() {
+  local path
+  path="$(sudo grubby --default-kernel)"
+  echo "${path#/boot/vmlinuz-}"
+}
 
 apply_nvidia_isolation() {
   sudo udevadm control --reload-rules
@@ -22,16 +31,18 @@ disable_usb_wakeup() {
 }
 
 intel_xe_driver() {
-  local device_id
+  local device_id kernel boot_args
   device_id="$(gpu_device_id 0x8086)"
+  kernel="$(boot_kernel)"
+  boot_args="$(sudo grubby --info=DEFAULT)"
 
-  if ! modinfo xe >/dev/null 2>&1; then
-    echo "The running kernel has no xe module, keeping i915."
+  if ! modinfo -k "$kernel" xe >/dev/null 2>&1; then
+    echo "Kernel $kernel has no xe module, keeping i915."
     return 0
   fi
 
   # xe only binds to pre-Lunar Lake GPUs when forced, and i915 has to be told to let go of the device
-  if ! grep -q "xe.force_probe=$device_id" /proc/cmdline; then
+  if [[ "$boot_args" != *"xe.force_probe=$device_id"* ]]; then
     sudo grubby --update-kernel=ALL --args="i915.force_probe=!$device_id xe.force_probe=$device_id"
     echo "To go back to i915: sudo grubby --update-kernel=ALL --remove-args=\"i915.force_probe xe.force_probe\""
     needs_restart "xe driver enabled for device $device_id"
@@ -40,16 +51,9 @@ intel_xe_driver() {
 
 # Proprietary NVIDIA driver from RPM Fusion, for cards the current driver branch supports (GTX 16xx and newer)
 nvidia_driver() {
-  # ---------- Secure Boot ----------
-  # The kernel refuses unsigned modules, so akmods needs a signing key that the firmware trusts
+  # With Secure Boot the kernel refuses the unsigned module and the desktop falls back to nouveau
   if mokutil --sb-state 2>/dev/null | grep -q "SecureBoot enabled"; then
-    local mok_cert="/etc/pki/akmods/certs/public_key.der"
-    sudo dnf install -y akmods mokutil openssl
-    sudo test -e "$mok_cert" || sudo kmodgenca -a
-    if ! sudo mokutil --test-key "$mok_cert" | grep -q "already enrolled"; then
-      echo "Secure Boot is enabled. Choose a one-time password now, then on the next boot pick 'Enroll MOK' and type it in."
-      sudo mokutil --import "$mok_cert"
-    fi
+    die "Secure Boot is enabled, so the NVIDIA module wouldn't load. Turn it off in the firmware settings and run this step again."
   fi
 
   # ---------- Driver ----------
@@ -62,12 +66,14 @@ nvidia_driver() {
 
   # ---------- Kernel module ----------
   # Build now instead of on the next boot, so a failed build shows up before the restart
-  echo "Building the NVIDIA kernel module, this can take a few minutes..."
-  sudo akmods --kernels "$(uname -r)"
-  if ! modinfo -F version nvidia >/dev/null 2>&1; then
-    die "The NVIDIA kernel module was not built for $(uname -r). See /var/cache/akmods/nvidia/ for the build log."
+  local kernel
+  kernel="$(boot_kernel)"
+  echo "Building the NVIDIA kernel module for $kernel, this can take a few minutes..."
+  sudo akmods --kernels "$kernel"
+  if ! modinfo -k "$kernel" -F version nvidia >/dev/null 2>&1; then
+    die "The NVIDIA kernel module was not built for $kernel. See /var/cache/akmods/nvidia/ for the build log."
   fi
-  echo "NVIDIA driver $(modinfo -F version nvidia) installed."
+  echo "NVIDIA driver $(modinfo -k "$kernel" -F version nvidia) installed."
   needs_restart "NVIDIA driver installed"
 }
 

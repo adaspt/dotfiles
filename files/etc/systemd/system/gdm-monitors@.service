@@ -1,0 +1,8 @@
+# Started by gdm-monitors@.path
+[Unit]
+Description=Copy %i's monitor layout to the login screen
+ConditionPathExists=/home/%i/.config/monitors.xml
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/install -D -m 644 /home/%i/.config/monitors.xml /var/lib/gdm/seat0/config/monitors.xml

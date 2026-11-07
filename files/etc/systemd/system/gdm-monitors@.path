@@ -1,0 +1,10 @@
+# Copies the user's monitor layout to the login screen whenever it changes in Settings > Displays.
+# Enabled per user by steps/gdm.sh: gdm-monitors@USERNAME.path
+[Unit]
+Description=Watch %i's monitor layout for the login screen
+
+[Path]
+PathChanged=/home/%i/.config/monitors.xml
+
+[Install]
+WantedBy=multi-user.target

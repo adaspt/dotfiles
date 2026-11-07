@@ -1,4 +1,3 @@
-# Installed by steps/dev.sh, after it adds the Microsoft and Claude Desktop repos
+# Installed by steps/dev.sh, after it adds Microsoft's repo
 azure-cli
 dotnet-sdk-10.0
-claude-desktop-unofficial
